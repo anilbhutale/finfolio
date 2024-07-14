@@ -45,21 +45,8 @@ jobs:
                 docker-compose -f docker-compose.prod.yml up -d
               else
                 echo "Not a git repository, skipping git pull"
-            #   fi
-            #   if [ -f  docker-compose -f docker-compose.prod.yml] || [ -f  docker-compose -f docker-compose.prod.yml ]; then
-            #     # Check Docker and Docker Compose installation
-            #     docker --version || (echo "Docker is not installed" && exit 1)
-            #      docker-compose --version || (echo "Docker Compose is not installed" && exit 1)
-            #      docker-compose -f docker-compose.prod.yml down
-            #      docker-compose -f docker-compose.prod.yml pull
-            #      docker-compose -f docker-compose.prod.yml build
-            #      docker-compose -f docker-compose.prod.yml up -d
-            #   else
-            #     echo " docker-compose -f docker-compose.prod.yml file not found, skipping Docker commands"
-            #     exit 1
-            #   fi
-            # else
-            #   echo "Directory /mnt/dev/finfolio does not exist"
-            #   exit 1
+            else
+              echo "Directory /mnt/dev/finfolio does not exist"
+              exit 1
             fi
           EOF
