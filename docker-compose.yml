@@ -17,6 +17,7 @@ services:
       - db
 
   react:
+    image: node:20
     build: ./frontend
     container_name: dev-react
     ports:
