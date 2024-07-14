@@ -34,8 +34,8 @@ jobs:
           SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
           sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
-            if [ -d /mnt/dev/portfolio ]; then
-              cd /mnt/dev/portfolio
+            if [ -d /mnt/dev/finfolio ]; then
+              cd /mnt/dev/finfolio
               if [ -d .git ]; then
                 git pull origin main || exit 1  # Update your codebase if it's a Git repository
               else
@@ -49,7 +49,7 @@ jobs:
                 exit 1
               fi
             else
-              echo "Directory /mnt/dev/portfolio does not exist"
+              echo "Directory /mnt/dev/finfolio does not exist"
               exit 1
             fi
           EOF
