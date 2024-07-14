@@ -48,7 +48,7 @@ jobs:
                 docker-compose --version || (echo "Docker Compose is not installed" && exit 1)
 
                 docker-compose pull
-                docker-compose up -d --verbose
+                docker-compose up -d
               else
                 echo "docker-compose.yml file not found, skipping Docker commands"
                 exit 1
