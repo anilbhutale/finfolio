@@ -10,15 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Deploy to DigitalOcean
-      #   env:
-      #     SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
-      #   run: |
-      #     sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
-      #       cd /mnt/dev/portfolio  # Change this to the path on your droplet
-      #       git pull origin main  # Optional: Update your codebase
-      #     EOF
-
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -43,8 +34,22 @@ jobs:
           SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
           sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
-            cd /mnt/dev/portfolio  # Change this to the path on your droplet
-            git pull origin main  # Optional: Update your codebase
-            docker-compose pull
-            docker-compose up -d
+            if [ -d /mnt/dev/portfolio ]; then
+              cd /mnt/dev/portfolio
+              if [ -d .git ]; then
+                git pull origin main || exit 1  # Update your codebase if it's a Git repository
+              else
+                echo "Not a git repository, skipping git pull"
+              fi
+              if [ -f docker-compose.yml ] || [ -f docker-compose.yaml ]; then
+                docker-compose pull || exit 1
+                docker-compose up -d || exit 1
+              else
+                echo "docker-compose.yml file not found, skipping Docker commands"
+                exit 1
+              fi
+            else
+              echo "Directory /mnt/dev/portfolio does not exist"
+              exit 1
+            fi
           EOF
