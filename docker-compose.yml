@@ -22,7 +22,7 @@ services:
     ports:
       - 3001:3000
     env_file:
-      - ./.env.dev
+      - ./.env-example
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
