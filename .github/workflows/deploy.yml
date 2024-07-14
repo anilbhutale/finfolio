@@ -16,19 +16,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # - name: Build Docker images
-      #   run: docker-compose build
-
+      # Install SSH Client and sshpass
       - name: Install SSH Client and sshpass
         run: sudo apt-get install -y openssh-client sshpass
 
+      # Create .ssh directory
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh
 
+      # Add SSH Host Key
       - name: Add SSH Host Key
         run: |
           ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
 
+      # Deploy to DigitalOcean
       - name: Deploy to DigitalOcean
         env:
           SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
@@ -45,6 +46,7 @@ jobs:
                 docker-compose -f docker-compose.prod.yml up -d
               else
                 echo "Not a git repository, skipping git pull"
+              fi
             else
               echo "Directory /mnt/dev/finfolio does not exist"
               exit 1
