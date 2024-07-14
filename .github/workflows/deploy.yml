@@ -19,8 +19,11 @@ jobs:
       - name: Build Docker images
         run: docker-compose build
 
-      - name: Install SSH Client
-        run: sudo apt-get install -y openssh-client
+      - name: Install SSH Client and sshpass
+        run: sudo apt-get install -y openssh-client sshpass
+
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
 
       - name: Add SSH Host Key
         run: |
