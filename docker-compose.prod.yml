@@ -25,6 +25,8 @@ services:
     ports:
       - "8081:80"
     restart: always
+    depends_on:
+      - django
     networks:
       - app-network
 
@@ -36,6 +38,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
+    depends_on:
+      - react
     networks:
       - app-network
 
