@@ -34,16 +34,21 @@ jobs:
           SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
           sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+            set -e  # Exit on any error
             if [ -d /mnt/dev/finfolio ]; then
               cd /mnt/dev/finfolio
               if [ -d .git ]; then
-                git pull origin main || exit 1  # Update your codebase if it's a Git repository
+                git pull origin main  # Update your codebase if it's a Git repository
               else
                 echo "Not a git repository, skipping git pull"
               fi
               if [ -f docker-compose.yml ] || [ -f docker-compose.yaml ]; then
-                docker-compose pull || exit 1
-                docker-compose up -d || exit 1
+                # Check Docker and Docker Compose installation
+                docker --version || (echo "Docker is not installed" && exit 1)
+                docker-compose --version || (echo "Docker Compose is not installed" && exit 1)
+
+                docker-compose pull
+                docker-compose up -d --verbose
               else
                 echo "docker-compose.yml file not found, skipping Docker commands"
                 exit 1
