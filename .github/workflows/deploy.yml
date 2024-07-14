@@ -42,7 +42,7 @@ jobs:
               else
                 echo "Not a git repository, skipping git pull"
               fi
-              if [ -f  docker-compose -f docker-compose.prod.yml.yml ] || [ -f  docker-compose -f docker-compose.prod.yml.yaml ]; then
+              if [ -f  docker-compose -f docker-compose.prod.yml] || [ -f  docker-compose -f docker-compose.prod.yml ]; then
                 # Check Docker and Docker Compose installation
                 docker --version || (echo "Docker is not installed" && exit 1)
                  docker-compose -f docker-compose.prod.yml --version || (echo "Docker Compose is not installed" && exit 1)
