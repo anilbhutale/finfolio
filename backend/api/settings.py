@@ -65,7 +65,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "138.68.126.112:8000",
     "138.68.126.112",
-    "http://localhost",
+    "http://138.68.126.112",
+    "http://138.68.126.112:8000" "http://138.68.126.112:8080" "http://138.68.126.112:80" "http://localhost",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
