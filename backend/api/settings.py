@@ -62,6 +62,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Add the specific origins that are allowed to access the API
     "http://localhost:8080",
+    "http://localhost:8000",
     "138.68.126.112:8000",
     "138.68.126.112",
     "http://localhost",
