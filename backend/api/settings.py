@@ -18,7 +18,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # .env.
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "test")
 
 # .env.
 DEBUG = int(os.environ.get("DEBUG", default=0))
@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "corsheaders",
     "drf_yasg",
     "rest_framework",
     "rest_framework_simplejwt",
@@ -51,12 +52,22 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django", "react", "nginx", "yourdoma
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Add the specific origins that are allowed to access the API
+    "http://localhost:8080",
+    "138.68.126.112:8000",
+    "138.68.126.112",
+    "http://localhost",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "api.urls"
 # put on your settings.py file below INSTALLED_APPS
@@ -136,7 +147,14 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATIC_URL = "/api_static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = "/static/"
+
+# Directory where static files will be collected
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Additional directories to look for static files
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
 MEDIA_URL = "/api_media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")

@@ -42,16 +42,16 @@ jobs:
               else
                 echo "Not a git repository, skipping git pull"
               fi
-              if [ -f docker-compose.yml ] || [ -f docker-compose.yaml ]; then
+              if [ -f  docker-compose -f docker-compose.prod.yml.yml ] || [ -f  docker-compose -f docker-compose.prod.yml.yaml ]; then
                 # Check Docker and Docker Compose installation
                 docker --version || (echo "Docker is not installed" && exit 1)
-                docker-compose --version || (echo "Docker Compose is not installed" && exit 1)
-                docker-compose down
-                docker-compose pull
-                docker-compose build
-                docker-compose up -d
+                 docker-compose -f docker-compose.prod.yml --version || (echo "Docker Compose is not installed" && exit 1)
+                 docker-compose -f docker-compose.prod.yml down
+                 docker-compose -f docker-compose.prod.yml pull
+                 docker-compose -f docker-compose.prod.yml build
+                 docker-compose -f docker-compose.prod.yml up -d
               else
-                echo "docker-compose.yml file not found, skipping Docker commands"
+                echo " docker-compose -f docker-compose.prod.yml.yml file not found, skipping Docker commands"
                 exit 1
               fi
             else

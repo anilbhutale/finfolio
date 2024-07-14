@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  django:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: prod-django
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.env-example
+    volumes:
+      - static:/srv/app/staticfiles
+      - media:/srv/app/media
+    restart: always
+    networks:
+      - app-network
+
+  react:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: prod-react
+    ports:
+      - "8081:80"
+    restart: always
+    networks:
+      - app-network
+
+  db:
+    image: postgres:16.1-alpine
+    container_name: prod-db
+    env_file:
+      - ./.env-example
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - app-network
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.prod
+    container_name: prod-nginx
+    ports:
+      - "80:80"  # Map port 80 on host to port 80 in the container
+    volumes:
+      - static:/srv/app/staticfiles
+      - media:/srv/app/media
+    depends_on:
+      - django
+      - react
+      - db
+    restart: always
+    networks:
+      - app-network
+
+
+volumes:
+  node_modules:
+  postgres_data:
+  media:
+  static:
+
+networks:
+  app-network:
+    driver: bridge
