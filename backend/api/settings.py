@@ -24,7 +24,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
 # .env.
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 INSTALLED_APPS = [
@@ -46,7 +46,7 @@ SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}},
 }
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django", "react", "nginx", "yourdomain.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django", "react", "nginx", "yourdomain.com", "138.68.126.112"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
