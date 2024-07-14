@@ -10,14 +10,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to DigitalOcean
-        env:
-          SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
-        run: |
-          sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
-            cd /mnt/dev/portfolio  # Change this to the path on your droplet
-            git pull origin main  # Optional: Update your codebase
-          EOF
+      # - name: Deploy to DigitalOcean
+      #   env:
+      #     SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
+      #   run: |
+      #     sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+      #       cd /mnt/dev/portfolio  # Change this to the path on your droplet
+      #       git pull origin main  # Optional: Update your codebase
+      #     EOF
 
       - name: Checkout code
         uses: actions/checkout@v3
