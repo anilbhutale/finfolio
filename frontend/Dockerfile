@@ -1,5 +1,5 @@
 # Use the official Node.js LTS image
-FROM node:lts-slim
+FROM node:18-slim
 
 # Set the working directory inside the container
 WORKDIR /srv/app
