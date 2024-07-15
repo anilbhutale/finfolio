@@ -47,7 +47,17 @@ SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}},
 }
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django", "react", "nginx", "yourdomain.com", "138.68.126.112"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "django",
+    "react",
+    "nginx",
+    "yourdomain.com",
+    "138.68.126.112",
+    "http://finfolio.bhutale.in/",
+    "finfolio.bhutale.in",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -66,7 +76,8 @@ CORS_ALLOWED_ORIGINS = [
     "138.68.126.112:8000",
     "138.68.126.112",
     "http://138.68.126.112",
-    "http://138.68.126.112:8000" "http://138.68.126.112:8080" "http://138.68.126.112:80" "http://localhost",
+    "http://finfolio.bhutale.in/",
+    "folio.bhutale.in/" "http://138.68.126.112:8000" "http://138.68.126.112:8080" "http://138.68.126.112:80" "http://localhost",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
