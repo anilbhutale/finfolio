@@ -16,7 +16,7 @@ Follow these steps to set up the Spend Smart frontend on your local machine:
 ### Clone the repository:
 
 ```bash
-git clone https://github.com/SaxenaShourya/spend-smart.git
+git clone https://github.com/anilbhutale/finfolio.git
 ```
 
 ### Frontend Setup
@@ -69,5 +69,5 @@ npm run dev
 
 ## For more Content
 
-- For feedback and support, email us at saxenashourya000@gmail.com 📧
-- Follow me on [Linkedin](https://www.linkedin.com/in/shouryasaxena) for updates. 🔗
+- For feedback and support, email us at arbhutale@gmail.com 📧
+- Follow me on [Linkedin](https://www.linkedin.com/in/anilbhutale) for updates. 🔗
