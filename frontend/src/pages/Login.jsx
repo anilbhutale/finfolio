@@ -170,6 +170,7 @@ const Login = () => {
                 isLoading={loginLoading}
                 handleSubmit={handleSubmit}
                 isDisabled={!password || !username || hasErrors}
+                label="Login"
               />
             </>
           ) : (

@@ -223,6 +223,7 @@ const Register = () => {
               isLoading={registerLoading}
               handleSubmit={handleSubmit}
               isDisabled={!email || !password || !username || hasErrors}
+              label="Register"
             />
           </>
           // ) : (

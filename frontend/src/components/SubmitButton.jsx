@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@nextui-org/react';
 
-const SubmitButton = ({ isLoading, handleSubmit, isDisabled }) => {
+const SubmitButton = ({ isLoading, handleSubmit, isDisabled, label }) => {
   return (
     <Button
       variant="ghost"
@@ -11,7 +11,7 @@ const SubmitButton = ({ isLoading, handleSubmit, isDisabled }) => {
       className="text-secondary hover:text-primary text-2xl w-full mt-8"
       onClick={handleSubmit}
     >
-      Submit
+      {label}
     </Button>
   );
 };
