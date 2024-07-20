@@ -174,13 +174,14 @@ const TransactionViewAndUpdateModal = () => {
 
   const setInitialData = async () => {
     if (initialTransaction) {
-      setFormData({
-        ...initialTransaction,
-        date: await parseDate(
-          moment(initialTransaction?.date).format('YYYY-MM-DD')
-        ),
-      });
-      setMainTitle(initialTransaction?.title);
+      console.log(initialTransaction)
+      // setFormData({
+      //   ...initialTransaction,
+      //   date: await parseDate(
+      //     moment(initialTransaction?.date).format('YYYY-MM-DD')
+      //   ),
+      // });
+      // setMainTitle(initialTransaction?.title);
     }
   };
 

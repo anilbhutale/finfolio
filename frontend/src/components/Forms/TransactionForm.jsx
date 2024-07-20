@@ -1,5 +1,5 @@
 import React from 'react';
-
+import moment from 'moment';
 import {
   Button,
   DatePicker,
@@ -8,7 +8,7 @@ import {
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { Title, Category, Add, Amount } from '../../utils/Icons';
+import { Title, Category, Add, Amount, Method, Source } from '../../utils/Icons'; // Ensure you have these icons
 
 const TransactionForm = ({
   categories,
@@ -21,8 +21,10 @@ const TransactionForm = ({
   handleOnChange,
   handleDateChange,
   handleSubmit,
+  transactionMethods, // New prop for transaction methods
+  transactionSources, // New prop for transaction sources
 }) => {
-  const { title, amount, description, category, date } = formData;
+  const { title, amount, description, category, date, transaction_type, transaction_method, transaction_source_type, transaction_source_id } = formData;
 
   return (
     <form className="flex flex-col justify-center items-center space-y-4 w-full lg:w-[45%]">
@@ -61,9 +63,9 @@ const TransactionForm = ({
           startContent={<Category />}
           className="text-gray-500"
         >
-          {categories.map((category) => (
-            <SelectItem key={category.value} value={category.value}>
-              {category.label}
+          {categories.map((cat) => (
+            <SelectItem key={cat.value} value={cat.value}>
+              {cat.label}
             </SelectItem>
           ))}
         </Select>
@@ -86,6 +88,64 @@ const TransactionForm = ({
         isInvalid={!!errors.description}
         errorMessage={errors?.description}
       />
+      <Select
+        name="transaction_type"
+        label="Transaction Type"
+        placeholder="Select the transaction type"
+        value={transaction_type}
+        onChange={handleOnChange}
+        isInvalid={!!errors.transaction_type}
+        errorMessage={errors?.transaction_type}
+        startContent={<Category />}
+        className="text-gray-500"
+      >
+        <SelectItem value="credit">Credit</SelectItem>
+        <SelectItem value="debit">Debit</SelectItem>
+      </Select>
+      <Select
+        name="transaction_method"
+        label="Transaction Method"
+        placeholder="Select the transaction method"
+        value={transaction_method}
+        onChange={handleOnChange}
+        isInvalid={!!errors.transaction_method}
+        errorMessage={errors?.transaction_method}
+        startContent={<Method />} // Ensure you have an icon for this
+        className="text-gray-500"
+      >
+        <SelectItem value="bank">Bank</SelectItem>
+        <SelectItem value="credit_card">Credit Card</SelectItem>
+        <SelectItem value="debit_card">Debit Card</SelectItem>
+        <SelectItem value="wallet">Wallet</SelectItem>
+        <SelectItem value="upi">UPI</SelectItem>
+      </Select>
+      <Select
+        name="transaction_source_type"
+        label="Transaction Source Type"
+        placeholder="Select the transaction source type"
+        value={transaction_source_type}
+        onChange={handleOnChange}
+        isInvalid={!!errors.transaction_source_type}
+        errorMessage={errors?.transaction_source_type}
+        startContent={<Source />} // Ensure you have an icon for this
+        className="text-gray-500"
+      >
+        <SelectItem value="bank">Bank Account</SelectItem>
+        <SelectItem value="credit_card">Credit Card</SelectItem>
+        <SelectItem value="debit_card">Debit Card</SelectItem>
+        <SelectItem value="wallet">Wallet</SelectItem>
+        <SelectItem value="upi">UPI</SelectItem>
+      </Select>
+      <Input
+        type="number"
+        label="Transaction Source ID"
+        placeholder="Enter the transaction source ID"
+        name="transaction_source_id"
+        value={transaction_source_id}
+        onChange={handleOnChange}
+        isInvalid={!!errors.transaction_source_id}
+        errorMessage={errors?.transaction_source_id}
+      />
       <Button
         color={btnColor}
         startContent={<Add />}
@@ -93,7 +153,7 @@ const TransactionForm = ({
         isLoading={isLoading}
         onClick={handleSubmit}
         isDisabled={
-          !title || !amount || !category || !date || !description || hasErrors
+          !title || !amount || !category || !date || !description || !transaction_type || !transaction_method || !transaction_source_type || !transaction_source_id || hasErrors
         }
       >
         {button}

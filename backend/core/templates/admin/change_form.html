@@ -1,0 +1,7 @@
+{% extends "admin/change_form.html" %} {% block content %} {{ block.super }} {%
+if transaction_source_details %}
+<div class="module">
+  <h2>Transaction Source Details</h2>
+  {{ transaction_source_details|safe }}
+</div>
+{% endif %} {% endblock %}

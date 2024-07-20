@@ -5,3 +5,4 @@ export const USERS_URL = '/user';
 export const TOKEN = '/user/token';
 export const INCOMES_URL = '/incomes';
 export const EXPENSES_URL = '/expenses';
+export const TRANSACTION_URL = '/transactions';

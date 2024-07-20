@@ -1,29 +1,85 @@
-from django import forms
 from django.contrib import admin
-from .models import Transaction, BankAccount, CreditCard
+from .models import Transaction
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.admin import GenericStackedInline
+from core.bank_account.models import BankAccount
+from core.credit_card.models import CreditCard
+from core.debit_card.models import DebitCard
+from core.wallet.models import Wallet
+from core.upi.models import UPI
 from unfold.admin import ModelAdmin
+from django.utils.html import format_html
+from django.urls import reverse
 
 
-class TransactionAdminForm(forms.ModelForm):
-    class Meta:
-        model = Transaction
-        fields = "__all__"
+class CreditCardInline(admin.StackedInline):
+    model = CreditCard
+    can_delete = False
+    verbose_name_plural = "Credit Card"
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        transaction_method = self.initial.get("transaction_method")
 
-        if transaction_method == "bank":
-            self.fields["transaction_source"].queryset = BankAccount.objects.all()
-        elif transaction_method == "credit_card":
-            self.fields["transaction_source"].queryset = CreditCard.objects.all()
-        elif transaction_method == "upi":
-            self.fields["transaction_source"].queryset = BankAccount.objects.all() | CreditCard.objects.all()
+class BankAccountInline(admin.StackedInline):
+    model = BankAccount
+    can_delete = False
+    verbose_name_plural = "Bank Account"
+
+
+class WalletInline(admin.StackedInline):
+    model = Wallet
+    can_delete = False
+    verbose_name_plural = "Wallet"
+
+
+class UPIInline(admin.StackedInline):
+    model = UPI
+    can_delete = False
+    verbose_name_plural = "UPI"
 
 
 class TransactionAdmin(ModelAdmin):
-    form = TransactionAdminForm
-    # Other configurations for admin display
+    list_display = ("title", "amount", "transaction_type", "transaction_method", "transaction_date", "transaction_source_display", "created_at")
+    list_filter = ("transaction_type", "transaction_method", "transaction_date", "user")
+    search_fields = ("title", "description")
+
+    def transaction_source_display(self, obj):
+        """Return detailed representation of the transaction source."""
+        if obj.transaction_source:
+            if isinstance(obj.transaction_source, CreditCard):
+                return format_html(
+                    '<a href="{}">{}</a>', reverse("admin:credit_card_creditcard_change", args=[obj.transaction_source.id]), obj.transaction_source
+                )
+            elif isinstance(obj.transaction_source, BankAccount):
+                return format_html(
+                    '<a href="{}">{}</a>', reverse("admin:bank_account_bankaccount_change", args=[obj.transaction_source.id]), obj.transaction_source
+                )
+            elif isinstance(obj.transaction_source, Wallet):
+                return format_html(
+                    '<a href="{}">{}</a>', reverse("admin:wallet_wallet_change", args=[obj.transaction_source.id]), obj.transaction_source
+                )
+            elif isinstance(obj.transaction_source, UPI):
+                return format_html('<a href="{}">{}</a>', reverse("admin:upi_upi_change", args=[obj.transaction_source.id]), obj.transaction_source)
+            else:
+                return str(obj.transaction_source)
+        return "None"
+
+    transaction_source_display.short_description = "Transaction Source"
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        """Customize the change view to include additional context."""
+        extra_context = extra_context or {}
+        transaction = self.get_object(request, object_id)
+        if transaction and transaction.transaction_source:
+            if isinstance(transaction.transaction_source, CreditCard):
+                extra_context["transaction_source_details"] = format_html("<h3>Credit Card Details:</h3><p>{}</p>", transaction.transaction_source)
+            elif isinstance(transaction.transaction_source, BankAccount):
+                extra_context["transaction_source_details"] = format_html("<h3>Bank Account Details:</h3><p>{}</p>", transaction.transaction_source)
+            elif isinstance(transaction.transaction_source, Wallet):
+                extra_context["transaction_source_details"] = format_html("<h3>Wallet Details:</h3><p>{}</p>", transaction.transaction_source)
+            elif isinstance(transaction.transaction_source, UPI):
+                extra_context["transaction_source_details"] = format_html("<h3>UPI Details:</h3><p>{}</p>", transaction.transaction_source)
+            else:
+                extra_context["transaction_source_details"] = "No details available"
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
 
 
 admin.site.register(Transaction, TransactionAdmin)

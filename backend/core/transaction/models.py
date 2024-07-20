@@ -1,9 +1,14 @@
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard
+from core.debit_card.models import DebitCard
 from core.wallet.models import Wallet
+from core.upi.models import UPI
 from core.invoice.models import Invoice
 from django.conf import settings
+from django.utils import timezone
 
 
 class Transaction(models.Model):
@@ -11,15 +16,16 @@ class Transaction(models.Model):
         ("bank", "Bank"),
         ("credit_card", "Credit Card"),
         ("debit_card", "Debit Card"),
-        ("wallet", "Walllet"),
-        ("bank_upi", "Bank UPI"),
-        ("credit_upi", "Credit Card UPI"),
+        ("wallet", "Wallet"),
+        ("upi", "UPI"),
     ]
 
     TRANSACTION_TYPES = [
         ("debit", "Debit"),
         ("credit", "Credit"),
     ]
+
+    title = models.CharField(max_length=255)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
@@ -27,9 +33,9 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()
     description = models.TextField()
-    transaction_sub_method = models.CharField(max_length=100, blank=True)
-    transaction_source = models.CharField(max_length=100, blank=True)  # Add field for bank/credit card details
-    transaction_source_name = models.CharField(max_length=100, blank=True)
+    transaction_source_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    transaction_source_id = models.PositiveIntegerField()
+    transaction_source = GenericForeignKey("transaction_source_type", "transaction_source_id")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,58 +43,81 @@ class Transaction(models.Model):
         return f"{self.transaction_type} - {self.amount}"
 
     def save(self, *args, **kwargs):
-        if self.pk:  # If it's an existing transaction being updated
+        # Handle balance update logic
+        if self.pk:  # If updating an existing transaction
             original_transaction = Transaction.objects.get(pk=self.pk)
+            self.reverse_balance(original_transaction)
 
-            # Revert the original balance based on the original transaction
-            if (
-                original_transaction.transaction_method == "bank"
-                or original_transaction.transaction_method == "debit_card"
-                or original_transaction.transaction_method == "bank_upi"
-            ):
-                bank = BankAccount.objects.get(id=original_transaction.transaction_source)
-                if original_transaction.transaction_type == "credit":
-                    bank.balance -= original_transaction.amount
-                elif original_transaction.transaction_type == "debit":
-                    bank.balance += original_transaction.amount
-                bank.save()
-            elif original_transaction.transaction_method == "credit_card" or original_transaction.transaction_method == "credit_upi":
-                credit_card = CreditCard.objects.get(id=original_transaction.transaction_source)
-                if original_transaction.transaction_type == "credit":
-                    credit_card.current_balance -= original_transaction.amount
-                elif original_transaction.transaction_type == "debit":
-                    credit_card.current_balance += original_transaction.amount
-                credit_card.save()
-            elif original_transaction.transaction_method == "wallet":
-                wallet = Wallet.objects.get(id=original_transaction.transaction_source)
-                if original_transaction.transaction_type == "credit":
-                    wallet.current_balance -= original_transaction.amount
-                elif original_transaction.transaction_type == "debit":
-                    wallet.current_balance += original_transaction.amount
-                wallet.save()
-
-        # Save the updated transaction
         super().save(*args, **kwargs)
+        self.update_balance()
 
-        # Update the balance based on the updated transaction
-        if self.transaction_method == "bank" or self.transaction_method == "debit_card" or self.transaction_method == "bank_upi":
-            bank = BankAccount.objects.get(id=self.transaction_source)
-            if self.transaction_type == "credit":
-                bank.balance += self.amount
-            elif self.transaction_type == "debit":
-                bank.balance -= self.amount
-            bank.save()
-        elif self.transaction_method == "credit_card" or self.transaction_method == "credit_upi":
-            credit_card = CreditCard.objects.get(id=self.transaction_source)
-            if self.transaction_type == "credit":
-                credit_card.current_balance += self.amount
-            elif self.transaction_type == "debit":
-                credit_card.current_balance -= self.amount
-            credit_card.save()
-        elif self.transaction_method == "wallet":
-            wallet = Wallet.objects.get(id=self.transaction_source)
-            if self.transaction_type == "credit":
-                wallet.current_balance += self.amount
-            elif self.transaction_type == "debit":
-                wallet.current_balance -= self.amount
-            wallet.save()
+    def reverse_balance(self, original_transaction):
+        if original_transaction.transaction_source:
+            if isinstance(original_transaction.transaction_source, BankAccount):
+                self.adjust_bank_balance(original_transaction, reverse=True)
+            elif isinstance(original_transaction.transaction_source, CreditCard):
+                self.adjust_credit_card_balance(original_transaction, reverse=True)
+            elif isinstance(original_transaction.transaction_source, DebitCard):
+                self.adjust_debit_card_balance(original_transaction, reverse=True)
+            elif isinstance(original_transaction.transaction_source, Wallet):
+                self.adjust_wallet_balance(original_transaction, reverse=True)
+            elif isinstance(original_transaction.transaction_source, UPI):
+                self.adjust_upi_balance(original_transaction, reverse=True)
+
+    def update_balance(self):
+        if self.transaction_source:
+            if isinstance(self.transaction_source, BankAccount):
+                self.adjust_bank_balance()
+            elif isinstance(self.transaction_source, CreditCard):
+                self.adjust_credit_card_balance()
+            elif isinstance(self.transaction_source, DebitCard):
+                self.adjust_debit_card_balance()
+            elif isinstance(self.transaction_source, Wallet):
+                self.adjust_wallet_balance()
+            elif isinstance(self.transaction_source, UPI):
+                self.adjust_upi_balance()
+
+    def adjust_bank_balance(self, transaction=None, reverse=False):
+        if transaction:
+            amount = -transaction.amount if transaction.transaction_type == "credit" else transaction.amount
+        else:
+            amount = self.amount if self.transaction_type == "credit" else -self.amount
+
+        bank = BankAccount.objects.get(id=self.transaction_source_id)
+        bank.balance += amount
+        bank.save()
+
+    def adjust_credit_card_balance(self, transaction=None, reverse=False):
+        if transaction:
+            amount = -transaction.amount if transaction.transaction_type == "credit" else transaction.amount
+        else:
+            amount = self.amount if self.transaction_type == "credit" else -self.amount
+
+        credit_card = CreditCard.objects.get(id=self.transaction_source_id)
+        credit_card.current_balance += amount
+        credit_card.save()
+
+    def adjust_debit_card_balance(self, transaction=None, reverse=False):
+        if transaction:
+            amount = -transaction.amount if transaction.transaction_type == "credit" else transaction.amount
+        else:
+            amount = self.amount if self.transaction_type == "credit" else -self.amount
+
+        debit_card = DebitCard.objects.get(id=self.transaction_source_id)
+        bank_account = debit_card.account
+        bank_account.balance += amount
+        bank_account.save()
+
+    def adjust_wallet_balance(self, transaction=None, reverse=False):
+        if transaction:
+            amount = -transaction.amount if transaction.transaction_type == "credit" else transaction.amount
+        else:
+            amount = self.amount if self.transaction_type == "credit" else -self.amount
+
+        wallet = Wallet.objects.get(id=self.transaction_source_id)
+        wallet.current_balance += amount
+        wallet.save()
+
+    def adjust_upi_balance(self, transaction=None, reverse=False):
+        # Implement UPI-specific balance adjustment if necessary
+        pass

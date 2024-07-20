@@ -15,14 +15,19 @@ import { updateLoader } from '../../features/loader/loaderSlice';
 import { TransactionForm } from '../../components/Forms';
 import validateForm from '../../utils/validateForm';
 import TransactionTable from '../../components/Tables/TransactionTable';
+import { useGetAllTransactionsQuery } from '../../features/api/apiSlices/transactionApiSlice';
 
 const Incomes = () => {
+  const { data: transactions = [], error, isLoading } = useGetAllTransactionsQuery('credit');
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
     description: '',
     category: '',
-    date: parseDate(moment().format('YYYY-MM-DD')),
+    date: parseDate(moment().format('YYYY-MM-DD')), // Initialize with today's date
+    transaction_method: '',
+    transaction_source_type: '',
+    transaction_source_id: '',
   });
   const [errors, setErrors] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
@@ -45,17 +50,33 @@ const Incomes = () => {
     { label: 'Other', value: 'other' },
   ];
 
+  const transactionMethods = [
+    { label: 'Bank', value: 'bank' },
+    { label: 'Credit Card', value: 'credit_card' },
+    { label: 'Debit Card', value: 'debit_card' },
+    { label: 'Wallet', value: 'wallet' },
+    { label: 'UPI', value: 'upi' },
+  ];
+
+  const transactionSources = [
+    { label: 'Bank Account', value: 'bank' },
+    { label: 'Credit Card', value: 'credit_card' },
+    { label: 'Debit Card', value: 'debit_card' },
+    { label: 'Wallet', value: 'wallet' },
+    { label: 'UPI', value: 'upi' },
+  ];
+
   const validationSchema = object({
     title: string()
       .required('Title is required.')
-      .min(5, 'Title must be atleast 5 characters long.')
+      .min(5, 'Title must be at least 5 characters long.')
       .max(15, 'Title should not be more than 15 characters.'),
     amount: number('Amount must be a number')
       .required('Amount is required.')
       .positive('Amount must be positive.'),
     description: string()
       .required('Description is required.')
-      .min(5, 'Description must be atleast 5 characters long.')
+      .min(5, 'Description must be at least 5 characters long.')
       .max(80, 'Description should not be more than 80 characters.'),
     date: date().required('Date is required.'),
     category: string()
@@ -72,6 +93,21 @@ const Incomes = () => {
         ],
         'Invalid category selected.'
       ),
+    transaction_method: string()
+      .required('Transaction method is required.')
+      .oneOf(
+        ['bank', 'credit_card', 'debit_card', 'wallet', 'upi'],
+        'Invalid transaction method.'
+      ),
+    transaction_source_type: string()
+      .required('Transaction source type is required.')
+      .oneOf(
+        ['bank', 'credit_card', 'debit_card', 'wallet', 'upi'],
+        'Invalid transaction source type.'
+      ),
+    transaction_source_id: number()
+      .required('Transaction source ID is required.')
+      .positive('Transaction source ID must be positive.'),
   });
 
   const chipColorMap = {
@@ -104,6 +140,7 @@ const Incomes = () => {
   } = useGetIncomeQuery({
     page: currentPage,
     pageSize: 10,
+    transaction_type: 'credit', // Filter to only get credit transactions
   });
   const dispatch = useDispatch();
 
@@ -134,6 +171,7 @@ const Incomes = () => {
       const updatedFormData = {
         ...formData,
         date: formattedDate,
+        transaction_type: 'credit', // Always credit for incomes
       };
 
       const res = await addIncome(updatedFormData).unwrap();
@@ -161,12 +199,13 @@ const Incomes = () => {
       <h3 className="text-3xl lg:text-5xl mt-4 text-center">
         Total Income -{' '}
         <span className="text-emerald-400">
-          $
+          {/* ₹ */}
           <NumericFormat
             className="ml-1 text-2xl lg:text-4xl"
             value={totalIncome}
             displayType={'text'}
             thousandSeparator={true}
+            prefix="₹"
           />
         </span>
       </h3>
@@ -174,6 +213,8 @@ const Incomes = () => {
         <TransactionForm
           button="Add Income"
           categories={incomeCategories}
+          transactionMethods={transactionMethods}
+          transactionSources={transactionSources}
           btnColor="success"
           formData={formData}
           errors={errors}
@@ -184,7 +225,7 @@ const Incomes = () => {
           handleSubmit={handleSubmit}
         />
         <TransactionTable
-          data={data?.incomes}
+          data={transactions}
           name="income"
           chipColorMap={chipColorMap}
           rowsPerPage={10}

@@ -6,8 +6,7 @@ import { toast } from 'react-toastify';
 import { NumericFormat } from 'react-number-format';
 
 import { Income, Expense, Balance } from '../../utils/Icons';
-import { useGetAllIncomesQuery } from '../../features/api/apiSlices/incomeApiSlice';
-import { useGetAllExpensesQuery } from '../../features/api/apiSlices/expenseApiSlice';
+import { useGetAllTransactionsQuery } from '../../features/api/apiSlices/transactionApiSlice';
 
 const DashboardPage = () => {
   const user = useSelector((state) => state.auth?.user?.username);
@@ -17,74 +16,60 @@ const DashboardPage = () => {
   const [totalExpense, setTotalExpense] = useState(0);
   const [recentHistory, setRecentHistory] = useState([]);
 
-  const { data: incomeData, refetch: refetchIncomes } = useGetAllIncomesQuery();
-  const { data: expenseData, refetch: refetchExpenses } =
-    useGetAllExpensesQuery();
+  const { data: transactions = [], error, isLoading } = useGetAllTransactionsQuery();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await refetchIncomes();
-        await refetchExpenses();
-        if (incomeData) {
-          setTotalIncome(incomeData.totalIncome || 0);
-        }
-        if (expenseData) {
-          setTotalExpense(expenseData.totalExpense || 0);
-        }
-        const totalBalance =
-          (incomeData?.totalIncome || 0) - (expenseData?.totalExpense || 0);
-        setTotalBalance(totalBalance);
+    if (transactions && transactions.length > 0) {
+      const incomes = transactions.filter(txn => txn.transaction_type === 'credit');
+      const expenses = transactions.filter(txn => txn.transaction_type === 'debit');
 
-        const recentHistory = [
-          ...(incomeData?.incomes || []).map((transaction) => ({
-            ...transaction,
-            type: 'income',
-          })),
-          ...(expenseData?.expenses || []).map((transaction) => ({
-            ...transaction,
-            type: 'expense',
-          })),
-        ];
-        recentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const recentTransactions = recentHistory.slice(0, 3);
+      const totalIncome = incomes.reduce((sum, txn) => sum + txn.amount, 0);
+      const totalExpense = expenses.reduce((sum, txn) => sum + txn.amount, 0);
+      setTotalIncome(totalIncome);
+      setTotalExpense(totalExpense);
+      setTotalBalance(totalIncome - totalExpense);
 
-        setRecentHistory(recentTransactions);
-      } catch (error) {
-        console.log(error);
-        toast.error(error?.data?.error || 'Unexpected Internal Server Error!');
-      }
+      const recentHistory = [...incomes, ...expenses];
+      recentHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setRecentHistory(recentHistory.slice(0, 3));
+    }
+  }, [transactions]);
+
+  const allDates = [
+    ...new Set([
+      ...transactions.filter(txn => txn.transaction_type === 'credit').map(txn => moment(txn.date).format('MM/DD/YYYY')),
+      ...transactions.filter(txn => txn.transaction_type === 'debit').map(txn => moment(txn.date).format('MM/DD/YYYY'))
+    ])
+  ];
+
+  const data = allDates.map(date => {
+    const incomeTotal = transactions
+      .filter(txn => txn.transaction_type === 'credit' && moment(txn.date).format('MM/DD/YYYY') === date)
+      .reduce((sum, txn) => sum + txn.amount, 0);
+
+    const expenseTotal = transactions
+      .filter(txn => txn.transaction_type === 'debit' && moment(txn.date).format('MM/DD/YYYY') === date)
+      .reduce((sum, txn) => sum + txn.amount, 0);
+
+    return {
+      name: date,
+      income: incomeTotal,
+      expense: expenseTotal,
     };
+  });
 
-    fetchData();
-  }, [refetchIncomes, refetchExpenses]); // Dependency array includes refetch functions
-
-  const incomeDates =
-    incomeData?.incomes?.map((income) =>
-      moment(income.date).format('MM/DD/YYYY')
-    ) || [];
-  const incomeAmounts =
-    incomeData?.incomes?.map((income) => income.amount) || [];
-  const expenseAmounts =
-    expenseData?.expenses?.map((expense) => expense.amount) || [];
-
-  const data =
-    incomeDates.length === 0 || expenseAmounts.length === 0
-      ? [
-          {
-            name: 'Data unavailable. Please add your incomes/expenses to populate this display.',
-            income: 0,
-            expense: 0,
-          },
-        ]
-      : incomeDates.map((date, index) => ({
-          name: date,
-          income: incomeAmounts[index] || 0,
-          expense: expenseAmounts[index] || 0,
-        }));
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <section className="w-full h-full md:h-[90vh] px-3 md:px-6">
+      <ul>
+        {transactions.map(transaction => (
+          <li key={transaction.id}>
+            {transaction.description}
+          </li>
+        ))}
+      </ul>
       <h2 className="text-2xl md:text-3xl lg:text-4xl mt-3 text-center sm:text-left text-pretty">
         Hello, {user}😊
       </h2>
@@ -98,7 +83,7 @@ const DashboardPage = () => {
           <div>
             <h4 className="font-outfit text-base md:text-lg">Total Balance</h4>
             <h4 className="text-2xl md:text-3xl mt-1">
-              $
+              ₹
               <NumericFormat
                 className="ml-1 text-xl md:text-2xl"
                 value={totalBalance}
@@ -113,7 +98,7 @@ const DashboardPage = () => {
           <div>
             <h4 className="font-outfit text-base md:text-lg">Total Incomes</h4>
             <h4 className="text-2xl md:text-3xl text-emerald-400 mt-1">
-              $
+              ₹
               <NumericFormat
                 className="ml-1 text-xl md:text-2xl"
                 value={totalIncome}
@@ -128,7 +113,7 @@ const DashboardPage = () => {
           <div>
             <h4 className="font-outfit text-base md:text-lg">Total Expenses</h4>
             <h4 className="text-2xl md:text-3xl text-red-400 mt-1">
-              $
+              ₹
               <NumericFormat
                 className="ml-1 text-xl md:text-2xl"
                 value={totalExpense}
@@ -163,7 +148,7 @@ const DashboardPage = () => {
                   className="border-2 border-secondary rounded-lg px-3 py-4 flex justify-between items-center"
                 >
                   <div className="flex gap-x-4">
-                    {transaction.type === 'income' ? (
+                    {transaction.transaction_type === 'credit' ? (
                       <Income className="icon-second" />
                     ) : (
                       <Expense className="icon-second" />
@@ -177,12 +162,12 @@ const DashboardPage = () => {
                   </div>
                   <h5
                     className={`text-xl ${
-                      transaction.type === 'income'
+                      transaction.transaction_type === 'credit'
                         ? 'text-emerald-400'
                         : 'text-red-400'
                     }`}
                   >
-                    ${transaction.amount}
+                    ₹{transaction.amount}
                   </h5>
                 </li>
               ))

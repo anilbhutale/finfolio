@@ -15,6 +15,9 @@ class Invoice(models.Model):
     invoice_date = models.DateTimeField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f"Invoice {self.id} - {self.total_amount}"
+
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, related_name="items", on_delete=models.CASCADE)
