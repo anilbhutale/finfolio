@@ -25,6 +25,7 @@ datapackage==1.15.4
 Django==5.0.7
 django-cors-headers==4.4.0
 django-extensions==3.2.3
+django-unfold==0.31.0
 djangorestframework==3.15.2
 djangorestframework-simplejwt==5.3.1
 docopt==0.6.2
@@ -66,6 +67,7 @@ packaging==24.1
 pandas==2.2.2
 pathspec==0.12.1
 peewee==3.17.6
+pillow==10.4.0
 Pint==0.24.3
 platformdirs==4.2.2
 pluggy==1.5.0
