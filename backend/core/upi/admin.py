@@ -1,7 +1,9 @@
 # admin.py
 from django.contrib import admin
-from .models import UPIApp, UPI
 from unfold.admin import ModelAdmin
+
+from .models import UPI, UPIApp
+
 
 @admin.register(UPIApp)
 class UPIAppAdmin(ModelAdmin):

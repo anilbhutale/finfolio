@@ -1,15 +1,17 @@
 from django.contrib import admin
-from .models import Transaction
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.admin import GenericStackedInline
+from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse
+from django.utils.html import format_html
+from unfold.admin import ModelAdmin
+
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard
 from core.debit_card.models import DebitCard
-from core.wallet.models import Wallet
 from core.upi.models import UPI
-from unfold.admin import ModelAdmin
-from django.utils.html import format_html
-from django.urls import reverse
+from core.wallet.models import Wallet
+
+from .models import Transaction
 
 
 class CreditCardInline(admin.StackedInline):

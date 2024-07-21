@@ -1,9 +1,11 @@
-from django.db import models
-from django.contrib.auth.models import User
 import math
+
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models
+
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard
-from django.conf import settings
 
 
 class Loan(models.Model):

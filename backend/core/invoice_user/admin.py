@@ -1,7 +1,8 @@
 # admin.py
 from django.contrib import admin
-from .models import User
 from unfold.admin import ModelAdmin
+
+from .models import User
 
 
 class OptionAdmin(ModelAdmin):

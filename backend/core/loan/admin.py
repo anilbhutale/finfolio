@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Loan
 from unfold.admin import ModelAdmin
+
+from .models import Loan
 
 
 @admin.register(Loan)

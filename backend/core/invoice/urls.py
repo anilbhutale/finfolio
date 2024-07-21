@@ -1,6 +1,7 @@
 # urls.py
 from django.urls import path
-from .views import InvoiceUploadView, InvoiceRetrieveView
+
+from .views import InvoiceRetrieveView, InvoiceUploadView
 
 urlpatterns = [
     path("invoice/", InvoiceUploadView.as_view(), name="upload-invoice"),

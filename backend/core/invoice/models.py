@@ -1,8 +1,8 @@
-from django.db import models
-from core.invoice_group.models import Option
 from django.conf import settings
+from django.db import models
+
+from core.invoice_group.models import Category, Option
 from core.invoice_user.models import User
-from core.invoice_group.models import Category
 
 
 class Invoice(models.Model):

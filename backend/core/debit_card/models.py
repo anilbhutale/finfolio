@@ -1,6 +1,7 @@
-from django.db import models
-from core.bank_account.models import BankAccount  # Assuming you have a Bank model
 from django.conf import settings
+from django.db import models
+
+from core.bank_account.models import BankAccount  # Assuming you have a Bank model
 
 
 class DebitCard(models.Model):

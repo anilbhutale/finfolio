@@ -15,13 +15,13 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
-from core import urls
+from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from core import urls
 from core.users.views import RegisterView, UserAPIView
 
 schema_view = get_schema_view(

@@ -1,11 +1,12 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class CreditCard(models.Model):
     CARD_TYPES = [
-        ('master', 'Master'),
-        ('visa', 'Visa'),
-        ('rupay', 'Rupay'),
+        ("master", "Master"),
+        ("visa", "Visa"),
+        ("rupay", "Rupay"),
     ]
     bank = models.CharField(max_length=16)
     name_on_card = models.CharField(max_length=16)

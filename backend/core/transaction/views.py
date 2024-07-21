@@ -1,8 +1,9 @@
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
+
 from .models import Transaction
 from .serializers import TransactionSerializer
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 
 class TransactionListCreateView(generics.ListCreateAPIView):

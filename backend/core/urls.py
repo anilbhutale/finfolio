@@ -1,14 +1,15 @@
-from django.urls import path, include
+from django.urls import include, path
+
 from core.bank_account.views import BankAccountViewSet
+from core.common import urls as commom_url
 from core.credit_card.views import CreditCardViewSet
-from core.loan.views import LoanListCreateView, LoanRetrieveUpdateDestroyView
 from core.debit_card import urls as debit_url
-from core.select_option import urls as select_option_url
+from core.invoice import urls as invoice_url
 from core.invoice_group import urls as invoice_group_url
 from core.invoice_user import urls as invoice_user_url
+from core.loan.views import LoanListCreateView, LoanRetrieveUpdateDestroyView
+from core.select_option import urls as select_option_url
 from core.transaction import urls as transaction_url
-from core.invoice import urls as invoice_url
-from core.common import urls as commom_url
 
 bank_account_list = BankAccountViewSet.as_view({"get": "list", "post": "create"})
 bank_account_detail = BankAccountViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})

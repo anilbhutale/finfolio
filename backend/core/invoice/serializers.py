@@ -1,9 +1,11 @@
 # serializers.py
 from rest_framework import serializers
-from .models import Invoice, InvoiceItem
-from core.users.views import UserSerializer as CurrentUser
+
 from core.invoice_user.serializers import InvoiceUserSerializer as InvoiceUser
 from core.select_option.serializers import CategorySerializer
+from core.users.views import UserSerializer as CurrentUser
+
+from .models import Invoice, InvoiceItem
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):

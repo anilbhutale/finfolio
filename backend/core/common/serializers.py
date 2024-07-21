@@ -1,9 +1,10 @@
 # serializers.py
 from rest_framework import serializers
+
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard
-from core.wallet.models import Wallet
 from core.loan.models import Loan
+from core.wallet.models import Wallet
 
 
 class BankSerializer(serializers.ModelSerializer):

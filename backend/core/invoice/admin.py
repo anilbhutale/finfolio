@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Invoice, InvoiceItem
 from unfold.admin import ModelAdmin
+
+from .models import Invoice, InvoiceItem
 
 
 class InvoiceItemInline(admin.TabularInline):
