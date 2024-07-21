@@ -42,6 +42,7 @@ export const Expense = BiDollarCircle;
 export const Settings = IoSettingsOutline
 export const Method = IoSettingsOutline;
 export const Source = IoSettingsOutline;
+export const Invoice = PiPiggyBank;
 export const ShutDown = RiShutDownLine;
 export const Menu = LuMenu;
 export const Balance = PiPiggyBank;

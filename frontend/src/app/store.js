@@ -8,7 +8,9 @@ import logoutModalReducer from '../features/logoutModal/logoutModalSlice';
 import transactionViewAndUpdateModalReducer from '../features/TransactionModals/viewAndUpdateModal';
 import deleteTransactionModalReducer from '../features/TransactionModals/deleteModal';
 import { transactionApiSlice } from '../features/api/apiSlices/transactionApiSlice';
+import { invoiceApiSlice } from '../features/api/apiSlices/invoiceApiSlice';
 import transactionReducer from '../features/api/reducer/transactionSlice';
+import invoiceReducer from '../features/api/reducer/invoiceSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,6 +22,9 @@ const store = configureStore({
     deleteTransactionModal: deleteTransactionModalReducer,
     [transactionApiSlice.reducerPath]: transactionApiSlice.reducer,
     transactions: transactionReducer,
+    // Add the invoice slice reducer
+    [invoiceApiSlice.reducerPath]: invoiceApiSlice.reducer,
+    invoices: invoiceReducer,
 
   },
   middleware: (getDefaultMiddleware) =>

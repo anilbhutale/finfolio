@@ -59,7 +59,7 @@ class InvoiceListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Invoice
-        fields = ["id", "items", "total_amount", "image", "description", "created_at", "user", "invoice_user", "invoice_date", "category"]
+        fields = ["id", "title", "items", "total_amount", "image", "description", "created_at", "user", "invoice_user", "invoice_date", "category"]
 
     def get_items(self, obj):
         # Retrieve the related item names for the given invoice

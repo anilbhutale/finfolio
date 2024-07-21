@@ -24,7 +24,7 @@ urlpatterns = [
     path("loans/", LoanListCreateView.as_view(), name="loan-list-create"),
     path("loans/<int:pk>/", LoanRetrieveUpdateDestroyView.as_view(), name="loan-detail"),
     path("", include(select_option_url)),
-    path("", include(invoice_group_url)),
+    path("invoice_group/", include(invoice_group_url)),
     path("", include(invoice_user_url)),
     path("", include(transaction_url)),
     path("", include(invoice_url)),

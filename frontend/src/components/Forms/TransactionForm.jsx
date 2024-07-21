@@ -8,7 +8,7 @@ import {
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { Title, Category, Add, Amount, Method, Source } from '../../utils/Icons'; // Ensure you have these icons
+import { Title, Category, Add, Amount, Method, Source, Invoice } from '../../utils/Icons'; // Ensure you have these icons
 
 const TransactionForm = ({
   categories,
@@ -21,10 +21,11 @@ const TransactionForm = ({
   handleOnChange,
   handleDateChange,
   handleSubmit,
-  transactionMethods, // New prop for transaction methods
-  transactionSources, // New prop for transaction sources
+  transactionMethods,
+  transactionSources,
+  invoices,
 }) => {
-  const { title, amount, description, category, date, transaction_type, transaction_method, transaction_source_type, transaction_source_id } = formData;
+  const { title, amount, description, category, date, transaction_type, transaction_method, transaction_source_type, transaction_source_id, invoice } = formData;
 
   return (
     <form className="flex flex-col justify-center items-center space-y-4 w-full lg:w-[45%]">
@@ -110,7 +111,7 @@ const TransactionForm = ({
         onChange={handleOnChange}
         isInvalid={!!errors.transaction_method}
         errorMessage={errors?.transaction_method}
-        startContent={<Method />} // Ensure you have an icon for this
+        startContent={<Method />}
         className="text-gray-500"
       >
         <SelectItem value="bank">Bank</SelectItem>
@@ -127,7 +128,7 @@ const TransactionForm = ({
         onChange={handleOnChange}
         isInvalid={!!errors.transaction_source_type}
         errorMessage={errors?.transaction_source_type}
-        startContent={<Source />} // Ensure you have an icon for this
+        startContent={<Source />}
         className="text-gray-500"
       >
         <SelectItem value="bank">Bank Account</SelectItem>
@@ -146,6 +147,23 @@ const TransactionForm = ({
         isInvalid={!!errors.transaction_source_id}
         errorMessage={errors?.transaction_source_id}
       />
+      <Select
+        name="invoice"
+        label="Invoice"
+        placeholder="Select Invoice"
+        value={formData.invoice} // Set initial value from formData
+        onChange={handleOnChange}
+        isInvalid={!!errors.invoice} // Check for validation errors
+        errorMessage={errors?.invoice} // Display error message
+        startContent={<Invoice />} // Optional icon for invoice
+        className="text-gray-500"
+      >
+        {invoices.map((invoice) => (
+          <SelectItem key={invoice.id} value={invoice.id}>
+            {` ${invoice.id} : ${invoice.title}`} 
+          </SelectItem>
+        ))}
+      </Select>
       <Button
         color={btnColor}
         startContent={<Add />}

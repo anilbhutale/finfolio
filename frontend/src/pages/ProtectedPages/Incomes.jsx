@@ -16,9 +16,15 @@ import { TransactionForm } from '../../components/Forms';
 import validateForm from '../../utils/validateForm';
 import TransactionTable from '../../components/Tables/TransactionTable';
 import { useGetAllTransactionsQuery } from '../../features/api/apiSlices/transactionApiSlice';
+import { useGetInvoicesByCategoryQuery } from '../../features/api/apiSlices/invoiceApiSlice';
 
 const Incomes = () => {
   const { data: transactions = [], error, isLoading } = useGetAllTransactionsQuery('credit');
+  const {
+    data: invoices = [],
+    error: invoicesError,
+    isLoading: invoicesLoading,
+  } = useGetInvoicesByCategoryQuery(1); //
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
@@ -142,20 +148,7 @@ const Incomes = () => {
     pageSize: 10,
     transaction_type: 'credit', // Filter to only get credit transactions
   });
-  const dispatch = useDispatch();
 
-  const fetchData = async () => {
-    try {
-      await refetch();
-      if (data?.incomes) {
-        setTotalIncome(data.totalIncome || 0);
-        setTotalPages(data.pagination.totalPages || 1);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error?.data?.error || 'Unexpected Internal Server Error!');
-    }
-  };
 
   const handleSubmit = async (e) => {
     try {
@@ -188,9 +181,9 @@ const Incomes = () => {
   };
 
   useEffect(() => {
-    fetchData();
-    if (isRefetchDeleteModal || isRefetchViewAndUpdateModal) fetchData();
-  }, [data, isRefetchDeleteModal, isRefetchViewAndUpdateModal]);
+    console.log(invoices)
+  
+  }, [data, isRefetchDeleteModal, isRefetchViewAndUpdateModal, invoices]);
 
   const hasErrors = Object.values(errors).some((error) => !!error);
 
@@ -213,6 +206,7 @@ const Incomes = () => {
         <TransactionForm
           button="Add Income"
           categories={incomeCategories}
+          invoices={invoices}
           transactionMethods={transactionMethods}
           transactionSources={transactionSources}
           btnColor="success"
