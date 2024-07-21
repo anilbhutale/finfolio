@@ -1,7 +1,6 @@
 import math
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import models
 
 from core.bank_account.models import BankAccount

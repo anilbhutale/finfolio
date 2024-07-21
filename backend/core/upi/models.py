@@ -1,7 +1,6 @@
 # models.py
 from django.conf import settings
 from django.db import models
-from unfold.admin import ModelAdmin
 
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard

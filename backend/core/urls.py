@@ -30,4 +30,5 @@ urlpatterns = [
     path("", include(transaction_url)),
     path("", include(invoice_url)),
     path("", include(commom_url)),
+    path("", include(debit_url)),
 ]

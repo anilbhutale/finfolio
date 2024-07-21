@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils import timezone
 
 from core.bank_account.models import BankAccount
 from core.credit_card.models import CreditCard
