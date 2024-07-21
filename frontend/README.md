@@ -1,12 +1,12 @@
-# Spend Smart Frontend
+# Finance PortFolio Frontend
 
-Welcome to the frontend repository of Spend Smart - your ultimate tool for managing your finances effortlessly. This repository contains all the frontend code necessary to interact with the Spend Smart backend and provide users with a seamless financial management experience.
+Welcome to the frontend repository of Finance PortFolio - your ultimate tool for managing your finances effortlessly. This repository contains all the frontend code necessary to interact with the Finance PortFolio backend and provide users with a seamless financial management experience.
 
 <hr/>
 
 ## Getting Started
 
-Follow these steps to set up the Spend Smart frontend on your local machine:
+Follow these steps to set up the Finance PortFolio frontend on your local machine:
 
 ### Prerequisites
 
@@ -39,7 +39,7 @@ npm install
 npm run dev
 ```
 
-- The development server will start running at http://localhost:8080, and you can access Spend Smart in your web browser.
+- The development server will start running at http://localhost:8080, and you can access Finance PortFolio in your web browser.
 
 <hr/>
 
@@ -63,7 +63,7 @@ npm run dev
 
 ## License:
 
-- Spend Smart is licensed under the [MIT License](../LICENSE).
+- Finance PortFolio is licensed under the [MIT License](../LICENSE).
 
 <hr/>
 

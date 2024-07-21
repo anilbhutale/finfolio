@@ -25,7 +25,7 @@ const SideBar = () => {
   return (
     <nav className="hidden xl:flex flex-col w-[15%] h-full border-r-1 border-secondary py-3">
       <div className="px-4 flex items-center gap-x-2">
-        <img src={logo} alt="spend smart logo" className="w-[2.5rem]" />
+        <img src={logo} alt="Finance PortFolio logo" className="w-[2.5rem]" />
         <h5 className="text-xl font-outfit">
           Spend<span className="text-primary text-xl">Smart.</span>
         </h5>

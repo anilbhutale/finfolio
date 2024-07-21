@@ -1,10 +1,10 @@
 {
-  "name": "spend-smart-frontend",
+  "name": "fin-folio-frontend",
   "private": true,
   "version": "1.0.0",
   "keywords": [
-    "spend-smart",
-    "spend-smart-frontend",
+    "fin-folio",
+    "fin-folio-frontend",
     "finance",
     "expense",
     "income",
@@ -15,7 +15,7 @@
   ],
   "author": "Anil Kumar Bhutale",
   "license": "MIT",
-  "description": "Spend Smart is a user-friendly platform designed to streamline your financial management effortlessly. With Spend Smart, you can easily track expenses, manage income, and stay on top of your finances effortlessly. Easily add transactions,and navigate your dashboard with ease. Take control of your finances with Spend Smart.",
+  "description": "Finance PortFolio is a user-friendly platform designed to streamline your financial management effortlessly. With Finance PortFolio, you can easily track expenses, manage income, and stay on top of your finances effortlessly. Easily add transactions,and navigate your dashboard with ease. Take control of your finances with Finance PortFolio.",
   "type": "module",
   "scripts": {
     "dev": "vite",

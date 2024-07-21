@@ -14,7 +14,7 @@ const NavBar = () => {
       <div className="flex items-center gap-x-3">
         <img
           src={logo}
-          alt="spend smart logo"
+          alt="Finance PortFolio logo"
           className="w-[2rem] md:w-[3rem]"
         />
         <h1

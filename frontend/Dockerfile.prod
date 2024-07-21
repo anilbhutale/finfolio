@@ -5,8 +5,8 @@ WORKDIR /srv/app
 # COPY package.json package-lock.json ./
 # RUN npm install
 COPY . ./
-RUN npm install
-RUN npm run build
+# RUN npm install
+# RUN npm run build
 
 # Stage 2: Serve
 FROM nginx:alpine
