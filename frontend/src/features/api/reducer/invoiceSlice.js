@@ -51,7 +51,9 @@ const invoiceSlice = createSlice({
       .addMatcher(
         invoiceApiSlice.endpoints.updateInvoice.matchFulfilled,
         (state, action) => {
-          const index = state.list.findIndex((invoice) => invoice.id === action.payload.id);
+          const index = state.list.findIndex(
+            (invoice) => invoice.id === action.payload.id
+          );
           if (index !== -1) {
             state.list[index] = action.payload;
           }
@@ -60,7 +62,9 @@ const invoiceSlice = createSlice({
       .addMatcher(
         invoiceApiSlice.endpoints.deleteInvoice.matchFulfilled,
         (state, action) => {
-          state.list = state.list.filter((invoice) => invoice.id !== action.payload.id);
+          state.list = state.list.filter(
+            (invoice) => invoice.id !== action.payload.id
+          );
         }
       );
   },

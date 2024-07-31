@@ -10,6 +10,8 @@ from core.invoice_user import urls as invoice_user_url
 from core.loan.views import LoanListCreateView, LoanRetrieveUpdateDestroyView
 from core.select_option import urls as select_option_url
 from core.transaction import urls as transaction_url
+from core.upi import urls as upi_url
+from core.wallet import urls as wallet_url
 
 bank_account_list = BankAccountViewSet.as_view({"get": "list", "post": "create"})
 bank_account_detail = BankAccountViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})
@@ -31,4 +33,7 @@ urlpatterns = [
     path("", include(invoice_url)),
     path("", include(commom_url)),
     path("", include(debit_url)),
+    path("", include(upi_url)),
+    path("", include(wallet_url)),
+    # Add other URLs as needed for CRUD operations
 ]

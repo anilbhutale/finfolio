@@ -16,7 +16,7 @@ class UPIApp(models.Model):
 # models.py
 class UPI(models.Model):
     upi_id = models.CharField(max_length=50, unique=True)
-    app = models.ForeignKey(UPIApp, on_delete=models.CASCADE)
+    app = models.ForeignKey(UPIApp, on_delete=models.CASCADE, related_name="upi_accounts")
     bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name="upi_accounts", null=True, blank=True)
     credit_card = models.ForeignKey(CreditCard, on_delete=models.CASCADE, related_name="upi_credit_cards", null=True, blank=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

@@ -61,10 +61,7 @@ const Home = () => {
           className="w-[90%] xl:w-[80%] mx-auto rounded-xl border-3 border-gray-300 order-1 sm:order-2"
         />
         <div className="hidden sm:flex justify-center items-center mt-4">
-          <Link
-            to="https://github.com/anilbhutale/finfolio"
-            target="_blank"
-          >
+          <Link to="https://github.com/anilbhutale/finfolio" target="_blank">
             <Button color="primary" radius="sm">
               Know More About the Project
             </Button>

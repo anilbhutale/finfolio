@@ -174,7 +174,7 @@ const TransactionViewAndUpdateModal = () => {
 
   const setInitialData = async () => {
     if (initialTransaction) {
-      console.log(initialTransaction)
+      console.log(initialTransaction);
       // setFormData({
       //   ...initialTransaction,
       //   date: await parseDate(

@@ -9,6 +9,7 @@ class CreditCard(models.Model):
         ("rupay", "Rupay"),
     ]
     bank = models.CharField(max_length=16)
+    name = models.CharField(max_length=50)
     name_on_card = models.CharField(max_length=16)
     card_number = models.CharField(max_length=16)
     card_type = models.CharField(max_length=10, choices=CARD_TYPES)

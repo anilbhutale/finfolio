@@ -1,9 +1,8 @@
-// transactionSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { transactionApiSlice } from '../apiSlices/transactionApiSlice';
+import { debitCardApiSlice } from '../apiSlices/debitCardApiSlice';
 
-const transactionSlice = createSlice({
-  name: 'transactions',
+const debitCardSlice = createSlice({
+  name: 'debitCards',
   initialState: {
     list: [],
     selected: null,
@@ -11,49 +10,49 @@ const transactionSlice = createSlice({
     error: null,
   },
   reducers: {
-    clearSelectedTransaction(state) {
+    clearSelectedDebitCard(state) {
       state.selected = null;
     },
   },
   extraReducers: (builder) => {
     builder
       .addMatcher(
-        transactionApiSlice.endpoints.getAllTransactions.matchPending,
+        debitCardApiSlice.endpoints.getAllDebitCards.matchPending,
         (state) => {
           state.status = 'loading';
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.getAllTransactions.matchFulfilled,
+        debitCardApiSlice.endpoints.getAllDebitCards.matchFulfilled,
         (state, action) => {
           state.status = 'succeeded';
           state.list = action.payload;
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.getAllTransactions.matchRejected,
+        debitCardApiSlice.endpoints.getAllDebitCards.matchRejected,
         (state, action) => {
           state.status = 'failed';
           state.error = action.error.message;
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.getTransactionById.matchFulfilled,
+        debitCardApiSlice.endpoints.getDebitCardById.matchFulfilled,
         (state, action) => {
           state.selected = action.payload;
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.createTransaction.matchFulfilled,
+        debitCardApiSlice.endpoints.createDebitCard.matchFulfilled,
         (state, action) => {
           state.list.push(action.payload);
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.updateTransaction.matchFulfilled,
+        debitCardApiSlice.endpoints.updateDebitCard.matchFulfilled,
         (state, action) => {
           const index = state.list.findIndex(
-            (transaction) => transaction.id === action.payload.id
+            (debitCard) => debitCard.id === action.payload.id
           );
           if (index !== -1) {
             state.list[index] = action.payload;
@@ -61,16 +60,16 @@ const transactionSlice = createSlice({
         }
       )
       .addMatcher(
-        transactionApiSlice.endpoints.deleteTransaction.matchFulfilled,
+        debitCardApiSlice.endpoints.deleteDebitCard.matchFulfilled,
         (state, action) => {
           state.list = state.list.filter(
-            (transaction) => transaction.id !== action.payload.id
+            (debitCard) => debitCard.id !== action.payload.id
           );
         }
       );
   },
 });
 
-export const { clearSelectedTransaction } = transactionSlice.actions;
+export const { clearSelectedDebitCard } = debitCardSlice.actions;
 
-export default transactionSlice.reducer;
+export default debitCardSlice.reducer;

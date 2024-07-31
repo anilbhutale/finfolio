@@ -16,15 +16,29 @@ const DashboardPage = () => {
   const [totalExpense, setTotalExpense] = useState(0);
   const [recentHistory, setRecentHistory] = useState([]);
 
-  const { data: transactions = [], error, isLoading } = useGetAllTransactionsQuery();
+  const {
+    data: transactions = [],
+    error,
+    isLoading,
+  } = useGetAllTransactionsQuery();
 
   useEffect(() => {
     if (transactions && transactions.length > 0) {
-      const incomes = transactions.filter(txn => txn.transaction_type === 'credit');
-      const expenses = transactions.filter(txn => txn.transaction_type === 'debit');
+      const incomes = transactions.filter(
+        (txn) => txn.transaction_type === 'credit'
+      );
+      const expenses = transactions.filter(
+        (txn) => txn.transaction_type === 'debit'
+      );
 
-      const totalIncome = incomes.reduce((sum, txn) => sum + txn.amount, 0);
-      const totalExpense = expenses.reduce((sum, txn) => sum + txn.amount, 0);
+      const totalIncome = incomes.reduce(
+        (sum, txn) => sum + parseInt(txn.amount),
+        0
+      );
+      const totalExpense = expenses.reduce(
+        (sum, txn) => sum + parseInt(txn.amount),
+        0
+      );
       setTotalIncome(totalIncome);
       setTotalExpense(totalExpense);
       setTotalBalance(totalIncome - totalExpense);
@@ -37,19 +51,31 @@ const DashboardPage = () => {
 
   const allDates = [
     ...new Set([
-      ...transactions.filter(txn => txn.transaction_type === 'credit').map(txn => moment(txn.date).format('MM/DD/YYYY')),
-      ...transactions.filter(txn => txn.transaction_type === 'debit').map(txn => moment(txn.date).format('MM/DD/YYYY'))
-    ])
+      ...transactions
+        .filter((txn) => txn.transaction_type === 'credit')
+        .map((txn) => moment(txn.date).format('MM/DD/YYYY')),
+      ...transactions
+        .filter((txn) => txn.transaction_type === 'debit')
+        .map((txn) => moment(txn.date).format('MM/DD/YYYY')),
+    ]),
   ];
 
-  const data = allDates.map(date => {
+  const data = allDates.map((date) => {
     const incomeTotal = transactions
-      .filter(txn => txn.transaction_type === 'credit' && moment(txn.date).format('MM/DD/YYYY') === date)
-      .reduce((sum, txn) => sum + txn.amount, 0);
+      .filter(
+        (txn) =>
+          txn.transaction_type === 'credit' &&
+          moment(txn.date).format('MM/DD/YYYY') === date
+      )
+      .reduce((sum, txn) => sum + parseInt(txn.amount), 0);
 
     const expenseTotal = transactions
-      .filter(txn => txn.transaction_type === 'debit' && moment(txn.date).format('MM/DD/YYYY') === date)
-      .reduce((sum, txn) => sum + txn.amount, 0);
+      .filter(
+        (txn) =>
+          txn.transaction_type === 'debit' &&
+          moment(txn.date).format('MM/DD/YYYY') === date
+      )
+      .reduce((sum, txn) => sum + parseInt(txn.amount), 0);
 
     return {
       name: date,
@@ -63,13 +89,7 @@ const DashboardPage = () => {
 
   return (
     <section className="w-full h-full md:h-[90vh] px-3 md:px-6">
-      <ul>
-        {transactions.map(transaction => (
-          <li key={transaction.id}>
-            {transaction.description}
-          </li>
-        ))}
-      </ul>
+      <ul></ul>
       <h2 className="text-2xl md:text-3xl lg:text-4xl mt-3 text-center sm:text-left text-pretty">
         Hello, {user}😊
       </h2>
@@ -156,7 +176,7 @@ const DashboardPage = () => {
                     <div>
                       <h5 className="capitalize line">{transaction.title}</h5>
                       <h5 className="font-outfit text-gray-500 capitalize">
-                        {transaction.category}
+                        {transaction.transaction_type}
                       </h5>
                     </div>
                   </div>

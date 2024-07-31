@@ -29,6 +29,7 @@ class Transaction(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    transaction_mode = models.CharField(max_length=100)
     transaction_method = models.CharField(max_length=20, choices=TRANSACTION_METHODS)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     transaction_date = models.DateField()

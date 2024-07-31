@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const handleLogout = () => {
   // Clear the token from localStorage
   localStorage.removeItem('token');
-  
+
   // Redirect to login page (You may need to use a custom hook or pass `navigate` another way)
   window.location.href = '/login'; // Or use a custom hook for redirection
 };
@@ -18,11 +18,11 @@ const baseQuery = async (args, api, extraOptions) => {
     credentials: 'include',
     prepareHeaders: (headers) => {
       let token = null;
-  
+
       try {
         // Retrieve the token string from localStorage
         const tokenString = localStorage.getItem('token');
-  
+
         // Check if the tokenString is not null and not equal to the string "undefined"
         if (tokenString && tokenString !== 'undefined') {
           token = JSON.parse(tokenString);
@@ -30,7 +30,7 @@ const baseQuery = async (args, api, extraOptions) => {
       } catch (error) {
         console.error('Error parsing token from localStorage:', error);
       }
-  
+
       if (token) {
         headers.set('Authorization', `Bearer ${token?.access}`);
       }

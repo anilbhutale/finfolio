@@ -1,30 +1,61 @@
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 
-from .models import Transaction
+from .models import UPI, BankAccount, CreditCard, DebitCard, Transaction, Wallet
 from .serializers import TransactionSerializer
+
+
+class TransactionMethodMap:
+    """
+    Mapping between transaction_method and corresponding model class.
+    """
+
+    MAP = {
+        "bank": BankAccount,
+        "credit_card": CreditCard,
+        "debit_card": DebitCard,
+        "wallet": Wallet,
+        "upi": UPI,
+    }
+
+    @classmethod
+    def get_model_class(cls, transaction_method):
+        model_class = cls.MAP.get(transaction_method)
+        if not model_class:
+            raise ValidationError("Invalid transaction method")
+        return model_class
 
 
 class TransactionListCreateView(generics.ListCreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
-    transaction_type_param = openapi.Parameter(
-        "transaction_type", openapi.IN_QUERY, description="Filter by transaction type (credit or debit)", type=openapi.TYPE_STRING
-    )
+    def perform_create(self, serializer):
+        transaction_method = self.request.data.get("transaction_method")
+        transaction_source_id = self.request.data.get("transaction_source_id")
 
-    @swagger_auto_schema(manual_parameters=[transaction_type_param])
+        model_class = TransactionMethodMap.get_model_class(transaction_method)
+        content_type = ContentType.objects.get_for_model(model_class)
+
+        # Ensure transaction_source_id is provided and valid
+        if not transaction_source_id:
+            raise ValidationError("transaction_source_id is required")
+
+        try:
+            model_class.objects.get(id=transaction_source_id)
+        except model_class.DoesNotExist:
+            raise ValidationError("Transaction source not found")
+
+        # Save the transaction with the correct content type and ID
+        serializer.save(user=self.request.user, transaction_source_type=content_type, transaction_source_id=transaction_source_id)
+
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Transaction.objects.filter(user=self.request.user)
         transaction_type = self.request.query_params.get("transaction_type", None)
         if transaction_type:
-            queryset = queryset.filter(transaction_type=transaction_type)
+            queryset = queryset.filter(transaction_type=transaction_type, user=self.request.user)
         return queryset
-
-    def perform_create(self, serializer):
-        # Set the user for the created transaction
-        serializer.save(user=self.request.user)
 
 
 class TransactionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -32,5 +63,26 @@ class TransactionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     serializer_class = TransactionSerializer
 
     def perform_update(self, serializer):
-        # Set the user for the updated transaction
-        serializer.save(user=self.request.user)
+        transaction_method = self.request.data.get("transaction_method")
+        transaction_source_id = self.request.data.get("transaction_source_id")
+
+        model_class = TransactionMethodMap.get_model_class(transaction_method)
+        content_type = ContentType.objects.get_for_model(model_class)
+
+        if not transaction_source_id:
+            raise ValidationError("transaction_source_id is required")
+
+        try:
+            model_class.objects.get(id=transaction_source_id)
+        except model_class.DoesNotExist:
+            raise ValidationError("Transaction source not found")
+
+        # Update the transaction with the correct content type and ID
+        serializer.save(user=self.request.user, transaction_source_type=content_type, transaction_source_id=transaction_source_id)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        transaction_type = self.request.query_params.get("transaction_type", None)
+        if transaction_type:
+            queryset = queryset.filter(transaction_type=transaction_type, user=self.request.user)
+        return queryset

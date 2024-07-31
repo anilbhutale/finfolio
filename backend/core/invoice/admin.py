@@ -12,6 +12,12 @@ class InvoiceItemInline(admin.TabularInline):
 @admin.register(Invoice)
 class InvoiceAdmin(ModelAdmin):
     inlines = [InvoiceItemInline]
+    list_display = [field.name for field in Invoice._meta.fields]
+    search_fields = [field.name for field in Invoice._meta.fields]
 
 
-admin.site.register(InvoiceItem)
+@admin.register(InvoiceItem)
+class InvoiceItemAdmin(ModelAdmin):
+    model = InvoiceItem
+    list_display = [field.name for field in InvoiceItem._meta.fields]
+    search_fields = [field.name for field in InvoiceItem._meta.fields]

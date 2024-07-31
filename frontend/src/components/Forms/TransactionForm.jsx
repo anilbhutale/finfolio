@@ -8,7 +8,15 @@ import {
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { Title, Category, Add, Amount, Method, Source, Invoice } from '../../utils/Icons'; // Ensure you have these icons
+import {
+  Title,
+  Category,
+  Add,
+  Amount,
+  Method,
+  Source,
+  Invoice,
+} from '../../utils/Icons'; // Ensure you have these icons
 
 const TransactionForm = ({
   categories,
@@ -21,11 +29,22 @@ const TransactionForm = ({
   handleOnChange,
   handleDateChange,
   handleSubmit,
-  transactionMethods,
-  transactionSources,
+  modeSourceType,
   invoices,
+  mode,
 }) => {
-  const { title, amount, description, category, date, transaction_type, transaction_method, transaction_source_type, transaction_source_id, invoice } = formData;
+  const {
+    title,
+    amount,
+    description,
+    category,
+    transaction_date,
+    transaction_type,
+    transaction_method,
+    transaction_source_id,
+    invoice,
+    transaction_mode,
+  } = formData;
 
   return (
     <form className="flex flex-col justify-center items-center space-y-4 w-full lg:w-[45%]">
@@ -65,20 +84,21 @@ const TransactionForm = ({
           className="text-gray-500"
         >
           {categories.map((cat) => (
-            <SelectItem key={cat.value} value={cat.value}>
-              {cat.label}
+            <SelectItem key={cat.id} value={cat.id}>
+              {cat.name}
             </SelectItem>
           ))}
         </Select>
         <DatePicker
           name="date"
           label="Select the date"
-          value={date}
+          value={transaction_date}
           onChange={handleDateChange}
-          isInvalid={!!errors.date}
-          errorMessage={errors?.date}
+          isInvalid={!!errors.transaction_date}
+          errorMessage={errors?.transaction_date}
         />
       </div>
+
       <Textarea
         name="description"
         label="Description"
@@ -89,55 +109,108 @@ const TransactionForm = ({
         isInvalid={!!errors.description}
         errorMessage={errors?.description}
       />
+      <div className="w-full grid grid-cols-2 gap-x-2">
+        <Select
+          name="transaction_type"
+          label="Transaction Type"
+          placeholder="Select the transaction type"
+          value={transaction_type}
+          onChange={handleOnChange}
+          isInvalid={!!errors.transaction_type}
+          errorMessage={errors?.transaction_type}
+          startContent={<Category />}
+          className="text-gray-500"
+        >
+          <SelectItem key="credit" value="credit">
+            Credit
+          </SelectItem>
+          <SelectItem key="debit" value="debit">
+            Debit
+          </SelectItem>
+        </Select>
+        <Select
+          name="invoice"
+          label="Invoice"
+          placeholder="Select Invoice"
+          value={invoice} // Set initial value from formData
+          onChange={handleOnChange}
+          isInvalid={!!errors.invoice} // Check for validation errors
+          errorMessage={errors?.invoice} // Display error message
+          startContent={<Invoice />} // Optional icon for invoice
+          className="text-gray-500"
+        >
+          {invoices.map((invoice) => (
+            <SelectItem key={invoice.id} value={invoice.id}>
+              {` ${invoice.id} : ${invoice.title}`}
+            </SelectItem>
+          ))}
+        </Select>
+      </div>
+      <div className="w-full grid grid-cols-2 gap-x-2">
+        <Select
+          name="transaction_method"
+          label="Transaction Method"
+          placeholder="Select the transaction method"
+          value={transaction_method}
+          onChange={handleOnChange}
+          isInvalid={!!errors.transaction_method}
+          errorMessage={errors?.transaction_method}
+          startContent={<Method />}
+          className="text-gray-500"
+        >
+          <SelectItem key="bank" value="bank">
+            Bank
+          </SelectItem>
+          <SelectItem key="credit_card" value="credit_card">
+            Credit Card
+          </SelectItem>
+          <SelectItem key="debit_card" value="">
+            Debit Card
+          </SelectItem>
+          <SelectItem key="wallet" value="wallet">
+            Wallet
+          </SelectItem>
+          <SelectItem key="upi" value="upi">
+            UPI
+          </SelectItem>
+        </Select>
+        <Select
+          name="transaction_mode"
+          label="Mode"
+          placeholder="Select the Mode"
+          value={transaction_mode}
+          onChange={handleOnChange}
+          isInvalid={!!errors.category}
+          errorMessage={errors?.category}
+          startContent={<Category />}
+          className="text-gray-500"
+        >
+          {mode.map((cat) => (
+            <SelectItem key={cat.name} value={cat.name}>
+              {cat.name}
+            </SelectItem>
+          ))}
+        </Select>
+      </div>
+      {/* <div className="w-full grid grid-cols-2 gap-x-2"> */}
       <Select
-        name="transaction_type"
-        label="Transaction Type"
-        placeholder="Select the transaction type"
-        value={transaction_type}
-        onChange={handleOnChange}
-        isInvalid={!!errors.transaction_type}
-        errorMessage={errors?.transaction_type}
-        startContent={<Category />}
-        className="text-gray-500"
-      >
-        <SelectItem value="credit">Credit</SelectItem>
-        <SelectItem value="debit">Debit</SelectItem>
-      </Select>
-      <Select
-        name="transaction_method"
-        label="Transaction Method"
-        placeholder="Select the transaction method"
-        value={transaction_method}
-        onChange={handleOnChange}
-        isInvalid={!!errors.transaction_method}
-        errorMessage={errors?.transaction_method}
-        startContent={<Method />}
-        className="text-gray-500"
-      >
-        <SelectItem value="bank">Bank</SelectItem>
-        <SelectItem value="credit_card">Credit Card</SelectItem>
-        <SelectItem value="debit_card">Debit Card</SelectItem>
-        <SelectItem value="wallet">Wallet</SelectItem>
-        <SelectItem value="upi">UPI</SelectItem>
-      </Select>
-      <Select
-        name="transaction_source_type"
+        name="transaction_source_id"
         label="Transaction Source Type"
         placeholder="Select the transaction source type"
-        value={transaction_source_type}
+        value={transaction_source_id}
         onChange={handleOnChange}
-        isInvalid={!!errors.transaction_source_type}
-        errorMessage={errors?.transaction_source_type}
+        isInvalid={!!errors.transaction_source_id}
+        errorMessage={errors?.transaction_source_id}
         startContent={<Source />}
         className="text-gray-500"
       >
-        <SelectItem value="bank">Bank Account</SelectItem>
-        <SelectItem value="credit_card">Credit Card</SelectItem>
-        <SelectItem value="debit_card">Debit Card</SelectItem>
-        <SelectItem value="wallet">Wallet</SelectItem>
-        <SelectItem value="upi">UPI</SelectItem>
+        {modeSourceType.map((cat) => (
+          <SelectItem key={cat.id} value={cat.id}>
+            {` ${cat.id} : ${cat.bank ? cat.bank : cat.name ? cat.name : cat.upi_id}`}
+          </SelectItem>
+        ))}
       </Select>
-      <Input
+      {/* <Input
         type="number"
         label="Transaction Source ID"
         placeholder="Enter the transaction source ID"
@@ -147,23 +220,8 @@ const TransactionForm = ({
         isInvalid={!!errors.transaction_source_id}
         errorMessage={errors?.transaction_source_id}
       />
-      <Select
-        name="invoice"
-        label="Invoice"
-        placeholder="Select Invoice"
-        value={formData.invoice} // Set initial value from formData
-        onChange={handleOnChange}
-        isInvalid={!!errors.invoice} // Check for validation errors
-        errorMessage={errors?.invoice} // Display error message
-        startContent={<Invoice />} // Optional icon for invoice
-        className="text-gray-500"
-      >
-        {invoices.map((invoice) => (
-          <SelectItem key={invoice.id} value={invoice.id}>
-            {` ${invoice.id} : ${invoice.title}`} 
-          </SelectItem>
-        ))}
-      </Select>
+      </div> */}
+
       <Button
         color={btnColor}
         startContent={<Add />}
@@ -171,7 +229,14 @@ const TransactionForm = ({
         isLoading={isLoading}
         onClick={handleSubmit}
         isDisabled={
-          !title || !amount || !category || !date || !description || !transaction_type || !transaction_method || !transaction_source_type || !transaction_source_id || hasErrors
+          !title ||
+          !amount ||
+          !category ||
+          !transaction_date ||
+          !description ||
+          !transaction_type ||
+          !transaction_method ||
+          hasErrors
         }
       >
         {button}

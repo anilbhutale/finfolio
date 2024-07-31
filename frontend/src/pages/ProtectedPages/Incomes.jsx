@@ -6,10 +6,7 @@ import { parseDate } from '@internationalized/date';
 import { NumericFormat } from 'react-number-format';
 
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  useGetIncomeQuery,
-  useAddIncomeMutation,
-} from '../../features/api/apiSlices/incomeApiSlice';
+import { useGetIncomeQuery } from '../../features/api/apiSlices/incomeApiSlice';
 import { updateLoader } from '../../features/loader/loaderSlice';
 
 import { TransactionForm } from '../../components/Forms';
@@ -17,24 +14,27 @@ import validateForm from '../../utils/validateForm';
 import TransactionTable from '../../components/Tables/TransactionTable';
 import { useGetAllTransactionsQuery } from '../../features/api/apiSlices/transactionApiSlice';
 import { useGetInvoicesByCategoryQuery } from '../../features/api/apiSlices/invoiceApiSlice';
+import { useGetAllInvoiceCategoriesQuery } from '../../features/api/apiSlices/InvoiceGroupSlice';
+import { useGetAllBankAccountsQuery } from '../../features/api/apiSlices/bankAccountApiSlice';
+import { useGetAllDebitCardsQuery } from '../../features/api/apiSlices/debitCardApiSlice';
+import { useGetAllWalletsQuery } from '../../features/api/apiSlices/walletApiSlice';
+import { useGetAllUpiAppsQuery } from '../../features/api/apiSlices/upiAppApiSlice';
+import { useGetSelectOptionsByCategoryQuery } from '../../features/api/apiSlices/selectOptionApiSlice';
+import { useCreateTransactionMutation } from '../../features/api/apiSlices/transactionApiSlice';
 
 const Incomes = () => {
-  const { data: transactions = [], error, isLoading } = useGetAllTransactionsQuery('credit');
-  const {
-    data: invoices = [],
-    error: invoicesError,
-    isLoading: invoicesLoading,
-  } = useGetInvoicesByCategoryQuery(1); //
   const [formData, setFormData] = useState({
     title: '',
     amount: '',
     description: '',
     category: '',
-    date: parseDate(moment().format('YYYY-MM-DD')), // Initialize with today's date
+    transaction_date: parseDate(moment().format('YYYY-MM-DD')), // Initialize with today's date
     transaction_method: '',
     transaction_source_type: '',
     transaction_source_id: '',
+    transaction_mode: '',
   });
+
   const [errors, setErrors] = useState({});
   const [totalIncome, setTotalIncome] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,15 +46,69 @@ const Incomes = () => {
     (state) => state.transactionViewAndUpdateModal.refetch
   );
 
-  const incomeCategories = [
-    { label: 'Salary', value: 'salary' },
-    { label: 'Freelance', value: 'freelance' },
-    { label: 'Investments', value: 'investments' },
-    { label: 'Rent', value: 'rent' },
-    { label: 'Youtube', value: 'youtube' },
-    { label: 'Bitcoin', value: 'bitcoin' },
-    { label: 'Other', value: 'other' },
-  ];
+  const [modeList, setModeList] = useState([]);
+  const [modeSourceType, setSourceType] = useState([]);
+  const dispatch = useDispatch();
+
+  const {
+    data: transactions = [],
+    error,
+    isLoading,
+  } = useGetAllTransactionsQuery('credit');
+  const {
+    data: invoiceCategories = [],
+    error: categoriesError,
+    isLoading: isLoadingCategories,
+  } = useGetAllInvoiceCategoriesQuery();
+  const {
+    data: bankAccounts = [],
+    error: accountsError,
+    isLoading: isLoadingAccounts,
+  } = useGetAllBankAccountsQuery();
+  const {
+    data: debitCards = [],
+    error: debitCardsError,
+    isLoading: isLoadingDebitCards,
+  } = useGetAllDebitCardsQuery();
+  const {
+    data: creditCards = [],
+    error: creditCardsError,
+    isLoading: isLoadingCreditCards,
+  } = useGetAllDebitCardsQuery();
+  const {
+    data: wallet = [],
+    error: walletError,
+    isLoading: isWalletLoading,
+  } = useGetAllWalletsQuery({
+    skip: formData.transaction_method !== 'wallet',
+  });
+
+  const {
+    data: upi = [],
+    error: upiError,
+    isLoading: isUpiLoading,
+  } = useGetAllUpiAppsQuery(undefined, {
+    skip: formData.transaction_method !== 'upi',
+  });
+
+  const {
+    data: category_method = [],
+    error: categoryError,
+    isLoading: isCategoryLoading,
+  } = useGetSelectOptionsByCategoryQuery(formData.transaction_method, {
+    skip:
+      !['bank', 'credit_card', 'debit_card'].includes(
+        formData.transaction_method
+      ) || !formData.transaction_method,
+  });
+
+  const {
+    data: invoices = [],
+    error: invoicesError,
+    isLoading: invoicesLoading,
+  } = useGetInvoicesByCategoryQuery(formData.category, {
+    skip: !formData.category,
+  });
 
   const transactionMethods = [
     { label: 'Bank', value: 'bank' },
@@ -84,36 +138,14 @@ const Incomes = () => {
       .required('Description is required.')
       .min(5, 'Description must be at least 5 characters long.')
       .max(80, 'Description should not be more than 80 characters.'),
-    date: date().required('Date is required.'),
-    category: string()
-      .required('Category is required.')
-      .oneOf(
-        [
-          'salary',
-          'freelance',
-          'investments',
-          'rent',
-          'youtube',
-          'bitcoin',
-          'other',
-        ],
-        'Invalid category selected.'
-      ),
-    transaction_method: string()
-      .required('Transaction method is required.')
-      .oneOf(
-        ['bank', 'credit_card', 'debit_card', 'wallet', 'upi'],
-        'Invalid transaction method.'
-      ),
-    transaction_source_type: string()
-      .required('Transaction source type is required.')
-      .oneOf(
-        ['bank', 'credit_card', 'debit_card', 'wallet', 'upi'],
-        'Invalid transaction source type.'
-      ),
-    transaction_source_id: number()
-      .required('Transaction source ID is required.')
-      .positive('Transaction source ID must be positive.'),
+    transaction_date: date().required('Date is required.'),
+    category: string().required('Category is required.'),
+    transaction_method: string().required('Transaction method is required.'),
+    transaction_mode: string().required('Transaction method is required.'),
+    transaction_source_type: string().required(
+      'Transaction source type is required.'
+    ),
+    // transaction_source_id: number().required('Transaction source ID is required.').positive('Transaction source ID must be positive.'),
   });
 
   const chipColorMap = {
@@ -134,11 +166,14 @@ const Incomes = () => {
 
     validateForm(e.target.name, e.target.value, validationSchema, setErrors);
   };
+
   const handleDateChange = (newDate) => {
-    setFormData({ ...formData, date: newDate });
+    setFormData({ ...formData, transaction_date: newDate });
   };
 
-  const [addIncome, { isLoading: addIncomeLoading }] = useAddIncomeMutation();
+  const [addIncome, { isLoading: addIncomeLoading }] =
+    useCreateTransactionMutation();
+
   const {
     data,
     isLoading: getIncomeLoading,
@@ -149,7 +184,6 @@ const Incomes = () => {
     transaction_type: 'credit', // Filter to only get credit transactions
   });
 
-
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -157,14 +191,19 @@ const Incomes = () => {
       dispatch(updateLoader(40));
 
       const formattedDate = moment({
-        year: formData.date.year,
-        month: formData.date.month - 1,
-        day: formData.date.day,
+        year: formData.transaction_date.year,
+        month: formData.transaction_date.month - 1,
+        day: formData.transaction_date.day,
       }).format('YYYY-MM-DD');
+
+      // data =
+      // if(formData.transaction_method){
+
+      // }
       const updatedFormData = {
         ...formData,
-        date: formattedDate,
-        transaction_type: 'credit', // Always credit for incomes
+        transaction_date: formattedDate,
+        transaction_source_type: '1',
       };
 
       const res = await addIncome(updatedFormData).unwrap();
@@ -172,7 +211,6 @@ const Incomes = () => {
       dispatch(updateLoader(60));
       toast.success(res.message || 'Income added successfully!');
     } catch (error) {
-      console.log(error);
       toast.error(error?.data?.error || 'Unexpected Internal Server Error!');
     } finally {
       await refetch();
@@ -181,9 +219,41 @@ const Incomes = () => {
   };
 
   useEffect(() => {
-    console.log(invoices)
-  
-  }, [data, isRefetchDeleteModal, isRefetchViewAndUpdateModal, invoices]);
+    if (formData.transaction_method === 'wallet' && !isWalletLoading) {
+      setModeList(wallet);
+      setSourceType(wallet);
+    } else if (formData.transaction_method === 'upi' && !isUpiLoading) {
+      setModeList(upi);
+      let upiApp = upi.find((app) => app.id == formData.transaction_mode);
+      setSourceType(upiApp?.upi_accounts ? upiApp.upi_accounts : []);
+    } else if (
+      ['bank', 'credit_card', 'debit_card'].includes(
+        formData.transaction_method
+      ) &&
+      !isCategoryLoading
+    ) {
+      setModeList(category_method);
+    }
+    if (formData.transaction_method == 'bank') {
+      setSourceType(bankAccounts);
+    }
+    if (formData.transaction_method == 'debit_card') {
+      setSourceType(debitCards);
+    }
+    if (formData.transaction_method == 'credit_card') {
+      setSourceType(creditCards);
+    }
+  }, [
+    formData.transaction_method,
+    formData.transaction_mode,
+    isWalletLoading,
+    isUpiLoading,
+    isCategoryLoading,
+    wallet,
+    upi,
+    category_method,
+    debitCards,
+  ]);
 
   const hasErrors = Object.values(errors).some((error) => !!error);
 
@@ -192,7 +262,6 @@ const Incomes = () => {
       <h3 className="text-3xl lg:text-5xl mt-4 text-center">
         Total Income -{' '}
         <span className="text-emerald-400">
-          {/* ₹ */}
           <NumericFormat
             className="ml-1 text-2xl lg:text-4xl"
             value={totalIncome}
@@ -205,10 +274,12 @@ const Incomes = () => {
       <section className="w-full h-full flex flex-col lg:flex-row px-6 md:px-8 lg:px-12 pt-6 space-y-8 lg:space-y-0 lg:space-x-8">
         <TransactionForm
           button="Add Income"
-          categories={incomeCategories}
+          categories={invoiceCategories}
+          mode={modeList}
           invoices={invoices}
           transactionMethods={transactionMethods}
           transactionSources={transactionSources}
+          modeSourceType={modeSourceType}
           btnColor="success"
           formData={formData}
           errors={errors}

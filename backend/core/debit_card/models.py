@@ -10,6 +10,7 @@ class DebitCard(models.Model):
         ("visa", "Visa"),
         ("rupay", "Rupay"),
     ]
+    name = models.CharField(max_length=50)
     card_type = models.CharField(max_length=10, choices=CARD_TYPES)
     card_number = models.CharField(max_length=16, unique=True)
     account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name="account_debit")  # Assuming you have a BankAccount model

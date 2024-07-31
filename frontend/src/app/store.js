@@ -11,6 +11,14 @@ import { transactionApiSlice } from '../features/api/apiSlices/transactionApiSli
 import { invoiceApiSlice } from '../features/api/apiSlices/invoiceApiSlice';
 import transactionReducer from '../features/api/reducer/transactionSlice';
 import invoiceReducer from '../features/api/reducer/invoiceSlice';
+import InvoiceGroupReducer from '../features/api/reducer/InvoiceGroupSlice';
+import bankAccountReducer from '../features/api/reducer/bankAccountSlice';
+import debitCardReducer from '../features/api/reducer/debitCardSlice';
+import walletReducer from '../features/api/reducer/walletSlice';
+import upiReducer from '../features/api/reducer/upiSlice';
+import selectOptionReducer from '../features/api/reducer/selectOptionSlice';
+import upiAppReducer from '../features/api/reducer/upiAppSlice';
+import creditCardReducer from '../features/api/reducer/creditCardSlice';
 
 const store = configureStore({
   reducer: {
@@ -20,12 +28,16 @@ const store = configureStore({
     logoutModal: logoutModalReducer,
     transactionViewAndUpdateModal: transactionViewAndUpdateModalReducer,
     deleteTransactionModal: deleteTransactionModalReducer,
-    [transactionApiSlice.reducerPath]: transactionApiSlice.reducer,
     transactions: transactionReducer,
-    // Add the invoice slice reducer
-    [invoiceApiSlice.reducerPath]: invoiceApiSlice.reducer,
     invoices: invoiceReducer,
-
+    invoiceGroup: InvoiceGroupReducer,
+    bankAccount: bankAccountReducer,
+    debitCards: debitCardReducer,
+    creditCards: creditCardReducer,
+    wallet: walletReducer,
+    upi: upiReducer,
+    select_options: selectOptionReducer,
+    upiApps: upiAppReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
