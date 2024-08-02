@@ -10,9 +10,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "theme('colors.blue.600')",
+        primary: "#FF7518",
         secondary: "theme('colors.gray.300')",
         error: '#E9094C',
+        // Dark mode colors
+        dark: {
+          primary: '#FF8C00', // Darker shade of orange
+          secondary: '#2D3748', // Dark gray
+          background: '#1A202C', // Dark background color
+        },
       },
       fontFamily: {
         nunito: ['Nunito', 'sans-serif'],

@@ -38,8 +38,8 @@ const App = () => {
         <Route path="/" element={<ProtectedRoutes />}>
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="/dashboard" element={<MainDashboard />} />
-            <Route path="/dashboard/incomes" element={<Incomes />} />
-            <Route path="/dashboard/expenses" element={<Expenses />} />
+            <Route path="/dashboard/transaction" element={<Incomes />} />
+            {/* <Route path="/dashboard/expenses" element={<Expenses />} /> */}
             <Route path="/dashboard/settings" element={<Settings />} />
           </Route>
         </Route>

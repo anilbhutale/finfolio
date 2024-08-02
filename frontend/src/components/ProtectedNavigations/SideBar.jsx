@@ -27,7 +27,7 @@ const SideBar = () => {
       <div className="px-4 flex items-center gap-x-2">
         <img src={logo} alt="Finance PortFolio logo" className="w-[2.5rem]" />
         <h5 className="text-xl font-outfit">
-          Spend<span className="text-primary text-xl">Smart.</span>
+          Fin<span className="text-primary text-xl">Folio.</span>
         </h5>
       </div>
       <menu className="w-full h-full flex flex-col px-3 mt-12">
@@ -45,16 +45,16 @@ const SideBar = () => {
           </li>
           <li
             className={`link ${
-              isRouteActive('/dashboard/incomes') ? 'activeLink' : ''
+              isRouteActive('/dashboard/transaction') ? 'activeLink' : ''
             }`}
             onClick={() => {
-              navigate('/dashboard/incomes');
+              navigate('/dashboard/transaction');
             }}
           >
             <Income className="size-[1.5rem]" />
-            Incomes
+            Transactions
           </li>
-          <li
+          {/* <li
             className={`link ${
               isRouteActive('/dashboard/expenses') ? 'activeLink' : ''
             }`}
@@ -64,7 +64,7 @@ const SideBar = () => {
           >
             <Expense className="size-[1.5rem]" />
             Expenses
-          </li>
+          </li> */}
         </div>
         <li
           className={`link mt-auto ${
