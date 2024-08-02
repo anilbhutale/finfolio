@@ -56,12 +56,12 @@ const Menu = () => {
           color="success"
           startContent={<Income />}
           description="View and Edit your incomes."
-          onPress={() => navigate('/dashboard/incomes')}
+          onPress={() => navigate('/dashboard/transaction')}
         >
-          Incomes
+          Transaction
         </DropdownItem>
 
-        <DropdownItem
+        {/* <DropdownItem
           key="expenses"
           color="danger"
           startContent={<Expense />}
@@ -69,7 +69,7 @@ const Menu = () => {
           onPress={() => navigate('/dashboard/expenses')}
         >
           Expenses
-        </DropdownItem>
+        </DropdownItem> */}
 
         <DropdownItem
           key="settingss"
