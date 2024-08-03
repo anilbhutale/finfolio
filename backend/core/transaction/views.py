@@ -54,7 +54,7 @@ class TransactionListCreateView(generics.ListCreateAPIView):
         queryset = Transaction.objects.filter(user=self.request.user)
         transaction_type = self.request.query_params.get("transaction_type", None)
         if transaction_type:
-            queryset = queryset.filter(transaction_type=transaction_type, user=self.request.user)
+            queryset = queryset.filter(transaction_type=transaction_type, user=self.request.user).select_related("invoice__category")
         return queryset
 
 

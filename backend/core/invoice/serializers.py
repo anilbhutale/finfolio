@@ -16,6 +16,7 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 class InvoiceSerializer(serializers.ModelSerializer):
     items = InvoiceItemSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
         model = Invoice

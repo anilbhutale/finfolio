@@ -6,7 +6,6 @@ import { parseDate } from '@internationalized/date';
 import { NumericFormat } from 'react-number-format';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetIncomeQuery } from '../../features/api/apiSlices/incomeApiSlice';
 import { updateLoader } from '../../features/loader/loaderSlice';
 
 import { TransactionForm } from '../../components/Forms';
@@ -54,7 +53,7 @@ const Incomes = () => {
     data: transactions = [],
     error,
     isLoading,
-  } = useGetAllTransactionsQuery('credit');
+  } = useGetAllTransactionsQuery();
   const {
     data: invoiceCategories = [],
     error: categoriesError,
@@ -174,16 +173,6 @@ const Incomes = () => {
   const [addIncome, { isLoading: addIncomeLoading }] =
     useCreateTransactionMutation();
 
-  const {
-    data,
-    isLoading: getIncomeLoading,
-    refetch,
-  } = useGetIncomeQuery({
-    page: currentPage,
-    pageSize: 10,
-    transaction_type: 'credit', // Filter to only get credit transactions
-  });
-
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -196,10 +185,6 @@ const Incomes = () => {
         day: formData.transaction_date.day,
       }).format('YYYY-MM-DD');
 
-      // data =
-      // if(formData.transaction_method){
-
-      // }
       const updatedFormData = {
         ...formData,
         transaction_date: formattedDate,
@@ -259,21 +244,9 @@ const Incomes = () => {
 
   return (
     <>
-      <h3 className="text-3xl lg:text-5xl mt-4 text-center">
-        Total Income -{' '}
-        <span className="text-emerald-400">
-          <NumericFormat
-            className="ml-1 text-2xl lg:text-4xl"
-            value={totalIncome}
-            displayType={'text'}
-            thousandSeparator={true}
-            prefix="₹"
-          />
-        </span>
-      </h3>
       <section className="w-full h-full flex flex-col lg:flex-row px-6 md:px-8 lg:px-12 pt-6 space-y-8 lg:space-y-0 lg:space-x-8">
         <TransactionForm
-          button="Add Income"
+          button="Submit"
           categories={invoiceCategories}
           mode={modeList}
           invoices={invoices}
@@ -294,7 +267,7 @@ const Incomes = () => {
           name="income"
           chipColorMap={chipColorMap}
           rowsPerPage={10}
-          isLoading={getIncomeLoading}
+          isLoading={isLoading}
           totalPages={totalPages}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}

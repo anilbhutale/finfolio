@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
+import { NumericFormat } from 'react-number-format';
 import moment from 'moment';
 import {
   Table,
@@ -11,6 +12,7 @@ import {
   Pagination,
   Chip,
   Spinner,
+  Input,
 } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { openModal as deleteModal } from '../../features/TransactionModals/deleteModal';
@@ -21,31 +23,123 @@ const TransactionTable = ({
   data,
   name,
   isLoading,
-  setCurrentPage,
-  totalPages,
-  currentPage,
   chipColorMap,
 }) => {
   const dispatch = useDispatch();
+  
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const itemsPerPage = 15;
+
+  // Filter and sort the data
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    const lowercasedQuery = searchQuery.toLowerCase();
+    const filteredItems = data.filter(item =>
+      item.title.toLowerCase().includes(lowercasedQuery) ||
+      item.description.toLowerCase().includes(lowercasedQuery) ||
+      item.invoice.category.name.toLowerCase().includes(lowercasedQuery)
+    );
+    
+    const sortableItems = [...filteredItems];
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [data, sortConfig, searchQuery]);
+
+  // Handle sorting
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Get sort icon
+  const getSortIcon = (key) => {
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'asc') {
+        return '▲';
+      }
+      return '▼';
+    }
+    return null;
+  };
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  // Calculate total income and expenses
+  const income = useMemo(() => {
+    return filteredData
+      .filter(item => item.transaction_type === 'credit')
+      .reduce((total, item) => total + parseFloat(item.amount), 0);
+  }, [filteredData]);
+
+  const expenses = useMemo(() => {
+    return filteredData
+      .filter(item => item.transaction_type === 'debit')
+      .reduce((total, item) => total + parseFloat(item.amount), 0);
+  }, [filteredData]);
+
   return (
-    <div className="w-full h-full flex justify-center">
+    <div className="w-full h-full flex flex-col items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-center mb-4">
+        <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+          <div className="flex items-center text-xl lg:text-2xl">
+            <h2>Total Income -
+              <span className="text-emerald-400 ml-2">
+                <NumericFormat
+                  className="ml-1 text-xl lg:text-2xl"
+                  value={income}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  prefix="₹"
+                />
+              </span>
+            </h2>
+          </div>
+          <div className="flex items-center text-xl lg:text-2xl">
+            <h3>Total Expenses -
+              <span className="text-red-400 ml-2 ">
+                <NumericFormat
+                  className="ml-1 text-xl lg:text-2xl"
+                  value={expenses}
+                  displayType={'text'}
+                  thousandSeparator={true}
+                  prefix="₹"
+                />
+              </span>
+            </h3>
+          </div>
+        </div>
+        <Input
+          clearable
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-64 mt-4 lg:mt-0 pl-4"
+        />
+      </div>
       <Table
         aria-label="Transactions table"
-        bottomContent={
-          totalPages > 1 ? (
-            <div className="flex w-full justify-center">
-              <Pagination
-                isCompact
-                showControls
-                showShadow
-                color="primary"
-                page={currentPage}
-                total={totalPages}
-                onChange={(page) => setCurrentPage(page)}
-              />
-            </div>
-          ) : null
-        }
         classNames={{
           base: 'pb-12',
           wrapper: 'h-full px-8 box-shadow-second',
@@ -53,17 +147,25 @@ const TransactionTable = ({
         }}
       >
         <TableHeader>
-          <TableColumn key={name} className="capitalize">
-            {name}
+          <TableColumn key="title" onClick={() => requestSort('title')} className="capitalize cursor-pointer">
+            {name} {getSortIcon('title')}
           </TableColumn>
-          <TableColumn key="amount">Amount</TableColumn>
-          <TableColumn key="category">Category</TableColumn>
-          <TableColumn key="description">Description</TableColumn>
-          <TableColumn key="date">Date</TableColumn>
+          <TableColumn key="amount" onClick={() => requestSort('amount')} className="cursor-pointer">
+            Amount {getSortIcon('amount')}
+          </TableColumn>
+          <TableColumn key="category" onClick={() => requestSort('invoice.category.name')} className="cursor-pointer">
+            Category {getSortIcon('invoice.category.name')}
+          </TableColumn>
+          <TableColumn key="description" onClick={() => requestSort('description')} className="cursor-pointer">
+            Description {getSortIcon('description')}
+          </TableColumn>
+          <TableColumn key="date" onClick={() => requestSort('date')} className="cursor-pointer">
+            Date {getSortIcon('date')}
+          </TableColumn>
           <TableColumn key="actions">Actions</TableColumn>
         </TableHeader>
         <TableBody
-          items={data || []}
+          items={currentItems || []}
           loadingContent={<Spinner color="primary" size="lg" />}
           loadingState={isLoading ? 'loading' : 'idle'}
           emptyContent={
@@ -72,7 +174,7 @@ const TransactionTable = ({
               : ''
           }
         >
-          {data?.map(({ title, amount, category, description, date, _id }) => (
+          {currentItems?.map(({ title, amount, invoice, description, date, _id }) => (
             <TableRow key={_id}>
               <TableCell className="text-primary font-calSans tracking-wider capitalize">
                 {title}
@@ -81,11 +183,11 @@ const TransactionTable = ({
               <TableCell>
                 <Chip
                   className="capitalize"
-                  color={chipColorMap[category]}
+                  color={chipColorMap[invoice.category.name]}
                   size="sm"
                   variant="flat"
                 >
-                  {category}
+                  {invoice.category.name}
                 </Chip>
               </TableCell>
               <TableCell
@@ -101,7 +203,7 @@ const TransactionTable = ({
                         transaction: {
                           title,
                           amount,
-                          category,
+                          category: invoice.category.name,
                           description,
                           date,
                         },
@@ -128,7 +230,7 @@ const TransactionTable = ({
                           transaction: {
                             title,
                             amount,
-                            category,
+                            category: invoice.category.name,
                             description,
                             date,
                           },
@@ -152,7 +254,7 @@ const TransactionTable = ({
                             _id,
                             title,
                             amount,
-                            category,
+                            category: invoice.category.name,
                             description,
                             date,
                           },
@@ -180,6 +282,19 @@ const TransactionTable = ({
           ))}
         </TableBody>
       </Table>
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4">
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="primary"
+            page={currentPage}
+            total={totalPages}
+            onChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      )}
     </div>
   );
 };
