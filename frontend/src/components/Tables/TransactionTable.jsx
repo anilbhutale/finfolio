@@ -215,6 +215,7 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
               transaction_method,
               transaction_mode,
               date,
+              description,
               _id,
             }) => (
               <TableRow key={_id}>
