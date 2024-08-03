@@ -211,6 +211,7 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
               title,
               amount,
               invoice,
+              invoice_data,
               transaction_source,
               transaction_method,
               transaction_mode,
@@ -226,11 +227,11 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
                 <TableCell>
                   <Chip
                     className="capitalize"
-                    color={chipColorMap[invoice.category.name]}
+                    color={chipColorMap[invoice_data.category.name]}
                     size="sm"
                     variant="flat"
                   >
-                    {invoice.category.name}
+                    {invoice_data.category.name}
                   </Chip>
                 </TableCell>
                 <TableCell>{transaction_method}</TableCell>

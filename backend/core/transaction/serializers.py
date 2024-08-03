@@ -8,7 +8,7 @@ from .models import Transaction
 
 class TransactionSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    invoice = InvoiceSerializer()
+    invoice_data = serializers.SerializerMethodField()
     transaction_source = serializers.SerializerMethodField()
 
     class Meta:
@@ -21,6 +21,9 @@ class TransactionSerializer(serializers.ModelSerializer):
         if "transaction_source_type" not in data:
             raise serializers.ValidationError({"transaction_source_type": "This field is required."})
         return data
+
+    def get_invoice_data(self, transaction):
+        return InvoiceSerializer(transaction.invoice).data
 
     def get_transaction_source(self, obj):
         # Get the model class for the transaction source
