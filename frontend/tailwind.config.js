@@ -10,7 +10,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#FF7518",
+        primary: '#FF7518',
         secondary: "theme('colors.gray.300')",
         error: '#E9094C',
         // Dark mode colors

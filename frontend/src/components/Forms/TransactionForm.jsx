@@ -55,15 +55,17 @@ const TransactionForm = ({
     invoice,
     transaction_mode,
   } = formData;
-    // Capitalize the first letter of the transactionType
-    const capitalizeFirstLetter = (string) => {
-      if (!string) return '';
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    };
-    const color = getColorForTransactionType(transaction_type);
+  // Capitalize the first letter of the transactionType
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+  const color = getColorForTransactionType(transaction_type);
   return (
     <form className="flex flex-col  items-center space-y-4 w-full lg:w-[45%]">
-       <h3 style={{ color: color }}>Add {capitalizeFirstLetter(transaction_type)} Transaction</h3>
+      <h3 style={{ color: color }}>
+        Add {capitalizeFirstLetter(transaction_type)} Transaction
+      </h3>
       <Input
         label="Title"
         placeholder="Enter the title"
@@ -75,56 +77,7 @@ const TransactionForm = ({
         startContent={<Title />}
         className="text-gray-500"
       />
-      <Input
-        type="number"
-        label="Amount"
-        placeholder="Enter the amount"
-        name="amount"
-        value={amount}
-        onChange={handleOnChange}
-        isInvalid={!!errors.amount}
-        errorMessage={errors?.amount}
-        startContent={<Amount />}
-        className="text-gray-500"
-      />
-      <div className="w-full grid grid-cols-2 gap-x-2">
-        <Select
-          name="category"
-          label="Category"
-          placeholder="Select the category"
-          value={category}
-          onChange={handleOnChange}
-          isInvalid={!!errors.category}
-          errorMessage={errors?.category}
-          startContent={<Category />}
-          className="text-gray-500"
-        >
-          {categories.map((cat) => (
-            <SelectItem key={cat.id} value={cat.id}>
-              {cat.name}
-            </SelectItem>
-          ))}
-        </Select>
-        <DatePicker
-          name="date"
-          label="Select the date"
-          value={transaction_date}
-          onChange={handleDateChange}
-          isInvalid={!!errors.transaction_date}
-          errorMessage={errors?.transaction_date}
-        />
-      </div>
 
-      <Textarea
-        name="description"
-        label="Description"
-        placeholder="Enter your description"
-        maxRows={4}
-        value={description}
-        onChange={handleOnChange}
-        isInvalid={!!errors.description}
-        errorMessage={errors?.description}
-      />
       <div className="w-full grid grid-cols-2 gap-x-2">
         <Select
           name="transaction_type"
@@ -144,6 +97,36 @@ const TransactionForm = ({
             Debit
           </SelectItem>
         </Select>
+
+        <DatePicker
+          name="date"
+          label="Select the date"
+          value={transaction_date}
+          onChange={handleDateChange}
+          isInvalid={!!errors.transaction_date}
+          errorMessage={errors?.transaction_date}
+        />
+      </div>
+
+      <div className="w-full grid grid-cols-2 gap-x-2">
+        <Select
+          name="category"
+          label="Category"
+          placeholder="Select the category"
+          value={category}
+          onChange={handleOnChange}
+          isInvalid={!!errors.category}
+          errorMessage={errors?.category}
+          startContent={<Category />}
+          className="text-gray-500"
+        >
+          {categories.map((cat) => (
+            <SelectItem key={cat.id} value={cat.id}>
+              {cat.name}
+            </SelectItem>
+          ))}
+        </Select>
+
         <Select
           name="invoice"
           label="Invoice"
@@ -208,24 +191,47 @@ const TransactionForm = ({
           ))}
         </Select>
       </div>
-      {/* <div className="w-full grid grid-cols-2 gap-x-2"> */}
-      <Select
-        name="transaction_source_id"
-        label="Transaction Source Type"
-        placeholder="Select the transaction source type"
-        value={transaction_source_id}
+      <div className="w-full grid grid-cols-2 gap-x-2">
+        <Select
+          name="transaction_source_id"
+          label="Transaction Source Type"
+          placeholder="Select the transaction source type"
+          value={transaction_source_id}
+          onChange={handleOnChange}
+          isInvalid={!!errors.transaction_source_id}
+          errorMessage={errors?.transaction_source_id}
+          startContent={<Source />}
+          className="text-gray-500"
+        >
+          {modeSourceType.map((cat) => (
+            <SelectItem key={cat.id} value={cat.id}>
+              {` ${cat.id} : ${cat.bank ? cat.bank : cat.name ? cat.name : cat.upi_id}`}
+            </SelectItem>
+          ))}
+        </Select>
+        <Input
+          type="number"
+          label="Amount"
+          placeholder="Enter the amount"
+          name="amount"
+          value={amount}
+          onChange={handleOnChange}
+          isInvalid={!!errors.amount}
+          errorMessage={errors?.amount}
+          startContent={<Amount />}
+          className="text-gray-500"
+        />
+      </div>
+      <Textarea
+        name="description"
+        label="Description"
+        placeholder="Enter your description"
+        maxRows={4}
+        value={description}
         onChange={handleOnChange}
-        isInvalid={!!errors.transaction_source_id}
-        errorMessage={errors?.transaction_source_id}
-        startContent={<Source />}
-        className="text-gray-500"
-      >
-        {modeSourceType.map((cat) => (
-          <SelectItem key={cat.id} value={cat.id}>
-            {` ${cat.id} : ${cat.bank ? cat.bank : cat.name ? cat.name : cat.upi_id}`}
-          </SelectItem>
-        ))}
-      </Select>
+        isInvalid={!!errors.description}
+        errorMessage={errors?.description}
+      />
       {/* <Input
         type="number"
         label="Transaction Source ID"
@@ -239,7 +245,7 @@ const TransactionForm = ({
       </div> */}
 
       <Button
-        color={transaction_type == "debit" ? "danger" : btnColor}
+        color={transaction_type == 'debit' ? 'danger' : btnColor}
         startContent={<Add />}
         className="text-white"
         isLoading={isLoading}

@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Avatar } from '@nextui-org/react';
@@ -39,7 +39,7 @@ const TopBar = () => {
         </Link>
       </div>
       <div className="flex justify-center items-center space-x-4">
-      <div
+        <div
           onClick={toggleDarkMode}
           className={`cursor-pointer ${isDarkMode ? 'text-yellow-400' : 'text-gray-800'}`}
         >
