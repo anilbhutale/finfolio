@@ -54,7 +54,8 @@ class Transaction(models.Model):
 
     def delete(self, *args, **kwargs):
         # Handle balance reversal before deleting the transaction
-        self.reverse_balance(self)
+        original_transaction = Transaction.objects.get(pk=self.pk)
+        self.reverse_balance(original_transaction)
 
         # Call the parent class's delete method to actually delete the record
         super().delete(*args, **kwargs)
