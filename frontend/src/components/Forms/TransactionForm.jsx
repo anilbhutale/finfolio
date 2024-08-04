@@ -17,16 +17,6 @@ import {
   Source,
   Invoice,
 } from '../../utils/Icons'; // Ensure you have these icons
-const getColorForTransactionType = (type) => {
-  switch (type) {
-    case 'debit':
-      return 'red'; // Danger color for debit
-    case 'credit':
-      return 'green'; // Success color for credit
-    default:
-      return '#FF7518'; // Default color
-  }
-};
 
 const TransactionForm = ({
   categories,
@@ -56,16 +46,9 @@ const TransactionForm = ({
     transaction_mode,
   } = formData;
   // Capitalize the first letter of the transactionType
-  const capitalizeFirstLetter = (string) => {
-    if (!string) return '';
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
-  const color = getColorForTransactionType(transaction_type);
+
   return (
-    <form className="flex flex-col  items-center space-y-4 w-full lg:w-[45%]">
-      <h3 style={{ color: color }}>
-        Add {capitalizeFirstLetter(transaction_type)} Transaction
-      </h3>
+    <form className="flex flex-col  items-center space-y-4 w-full">
       <Input
         label="Title"
         placeholder="Enter the title"
@@ -232,19 +215,8 @@ const TransactionForm = ({
         isInvalid={!!errors.description}
         errorMessage={errors?.description}
       />
-      {/* <Input
-        type="number"
-        label="Transaction Source ID"
-        placeholder="Enter the transaction source ID"
-        name="transaction_source_id"
-        value={transaction_source_id}
-        onChange={handleOnChange}
-        isInvalid={!!errors.transaction_source_id}
-        errorMessage={errors?.transaction_source_id}
-      />
-      </div> */}
 
-      <Button
+      {/* <Button
         color={transaction_type == 'debit' ? 'danger' : btnColor}
         startContent={<Add />}
         className="text-white"
@@ -262,7 +234,7 @@ const TransactionForm = ({
         }
       >
         {button}
-      </Button>
+      </Button> */}
     </form>
   );
 };

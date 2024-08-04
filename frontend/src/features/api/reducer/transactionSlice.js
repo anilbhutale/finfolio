@@ -63,8 +63,9 @@ const transactionSlice = createSlice({
       .addMatcher(
         transactionApiSlice.endpoints.deleteTransaction.matchFulfilled,
         (state, action) => {
+          debugger;
           state.list = state.list.filter(
-            (transaction) => transaction.id !== action.payload.id
+            (transaction) => transaction.id != action.meta.arg.originalArgs
           );
         }
       );

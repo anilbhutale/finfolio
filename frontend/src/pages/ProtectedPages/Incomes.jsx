@@ -3,7 +3,14 @@ import { object, string, number, date } from 'yup';
 import { toast } from 'react-toastify';
 import moment from 'moment';
 import { parseDate } from '@internationalized/date';
-import { NumericFormat } from 'react-number-format';
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+} from '@nextui-org/react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { updateLoader } from '../../features/loader/loaderSlice';
@@ -38,12 +45,7 @@ const Incomes = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const isRefetchDeleteModal = useSelector(
-    (state) => state.deleteTransactionModal.refetch
-  );
-  const isRefetchViewAndUpdateModal = useSelector(
-    (state) => state.transactionViewAndUpdateModal.refetch
-  );
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [modeList, setModeList] = useState([]);
   const [modeSourceType, setSourceType] = useState([]);
@@ -144,7 +146,6 @@ const Incomes = () => {
     transaction_source_type: string().required(
       'Transaction source type is required.'
     ),
-    // transaction_source_id: number().required('Transaction source ID is required.').positive('Transaction source ID must be positive.'),
   });
 
   const chipColorMap = {
@@ -195,13 +196,16 @@ const Incomes = () => {
 
       dispatch(updateLoader(60));
       toast.success(res.message || 'Income added successfully!');
+      closeModal(); // Close the modal after submission
     } catch (error) {
       toast.error(error?.data?.error || 'Unexpected Internal Server Error!');
     } finally {
-      await refetch();
       dispatch(updateLoader(100));
     }
   };
+
+  const openModal = () => setModalIsOpen(true);
+  const closeModal = () => setModalIsOpen(false);
 
   useEffect(() => {
     if (formData.transaction_method === 'wallet' && !isWalletLoading) {
@@ -241,27 +245,105 @@ const Incomes = () => {
   ]);
 
   const hasErrors = Object.values(errors).some((error) => !!error);
-
+  const capitalizeFirstLetter = (string) => {
+    if (!string) return '';
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+  const getColorForTransactionType = (type) => {
+    switch (type) {
+      case 'debit':
+        return 'red'; // Danger color for debit
+      case 'credit':
+        return 'green'; // Success color for credit
+      default:
+        return '#FF7518'; // Default color
+    }
+  };
+  const color = getColorForTransactionType(formData.transaction_type);
   return (
     <>
       <section className="w-full h-full flex flex-col lg:flex-row px-6 md:px-8 lg:px-12 pt-6 space-y-8 lg:space-y-0 lg:space-x-8">
-        <TransactionForm
-          button="Submit"
-          categories={invoiceCategories}
-          mode={modeList}
-          invoices={invoices}
-          transactionMethods={transactionMethods}
-          transactionSources={transactionSources}
-          modeSourceType={modeSourceType}
-          btnColor="success"
-          formData={formData}
-          errors={errors}
-          hasErrors={hasErrors}
-          isLoading={addIncomeLoading}
-          handleOnChange={handleOnChange}
-          handleDateChange={handleDateChange}
-          handleSubmit={handleSubmit}
-        />
+        {/* Transaction Form Modal */}
+
+        <Modal
+          isOpen={modalIsOpen}
+          onClose={() => closeModal()}
+          placement="center"
+          backdrop="blur"
+        >
+          <ModalContent>
+            <>
+              <ModalHeader>
+                <h4
+                  style={{ color: color }}
+                  className="text-2xl text-primary tracking-relaxed"
+                >
+                  Add {capitalizeFirstLetter(formData.transaction_type)}{' '}
+                  Transaction
+                </h4>
+              </ModalHeader>
+              <ModalBody>
+                <TransactionForm
+                  button="Submit"
+                  categories={invoiceCategories}
+                  mode={modeList}
+                  invoices={invoices}
+                  transactionMethods={transactionMethods}
+                  transactionSources={transactionSources}
+                  modeSourceType={modeSourceType}
+                  btnColor="success"
+                  formData={formData}
+                  errors={errors}
+                  hasErrors={Object.values(errors).some((error) => !!error)}
+                  isLoading={addIncomeLoading}
+                  handleOnChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      [e.target.name]: e.target.value,
+                    })
+                  }
+                  handleDateChange={(date) =>
+                    setFormData({ ...formData, transaction_date: date })
+                  }
+                  handleSubmit={handleSubmit}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onPress={() => closeModal()}
+                  className="text-base"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color={
+                    formData.transaction_type == 'debit' ? 'danger' : 'success'
+                  }
+                  onClick={handleSubmit}
+                  // endContent={<Logout />}
+                  isLoading={isLoading}
+                  className="text-base"
+                  isDisabled={
+                    !formData.title ||
+                    !formData.amount ||
+                    !formData.category ||
+                    !formData.transaction_date ||
+                    !formData.description ||
+                    !formData.transaction_type ||
+                    !formData.transaction_method ||
+                    hasErrors
+                  }
+                >
+                  Submit
+                </Button>
+              </ModalFooter>
+            </>
+          </ModalContent>
+        </Modal>
+
+        {/* Other components like TransactionTable */}
         <TransactionTable
           data={transactions}
           name="income"
@@ -271,6 +353,7 @@ const Incomes = () => {
           totalPages={totalPages}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
+          openModal={openModal}
         />
       </section>
     </>

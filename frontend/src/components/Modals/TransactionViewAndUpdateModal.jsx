@@ -47,6 +47,11 @@ const TransactionViewAndUpdateModal = () => {
     description: '',
     category: '',
     date: parseDate(moment().format('YYYY-MM-DD')),
+    transaction_method: '',
+    transaction_mode: '',
+    transaction_source_id: '',
+    transaction_source_type: '',
+    transaction_type: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -73,14 +78,14 @@ const TransactionViewAndUpdateModal = () => {
   const validationSchema = object({
     title: string()
       .required('Title is required.')
-      .min(5, 'Title must be atleast 5 characters long.')
+      .min(5, 'Title must be at least 5 characters long.')
       .max(15, 'Title should not be more than 15 characters.'),
     amount: number('Amount must be a number')
       .required('Amount is required.')
       .positive('Amount must be positive.'),
     description: string()
       .required('Description is required.')
-      .min(5, 'Description must be atleast 5 characters long.')
+      .min(5, 'Description must be at least 5 characters long.')
       .max(80, 'Description should not be more than 80 characters.'),
     date: date().required('Date is required.'),
     category: string()
@@ -91,6 +96,15 @@ const TransactionViewAndUpdateModal = () => {
           : expenseCategories.map((category) => category.value),
         'Invalid category selected.'
       ),
+    transaction_method: string().required('Transaction method is required.'),
+    transaction_mode: string().required('Transaction mode is required.'),
+    transaction_source_id: string().required(
+      'Transaction source ID is required.'
+    ),
+    transaction_source_type: string().required(
+      'Transaction source type is required.'
+    ),
+    transaction_type: string().required('Transaction type is required.'),
   });
 
   const handleOnChange = (e) => {
@@ -101,8 +115,8 @@ const TransactionViewAndUpdateModal = () => {
 
     validateForm(e.target.name, e.target.value, validationSchema, setErrors);
   };
+
   const handleDateChange = (newDate) => {
-    console.log(newDate);
     setFormData({
       ...formData,
       date: newDate,
@@ -115,7 +129,13 @@ const TransactionViewAndUpdateModal = () => {
     category,
     description,
     date: transactionDate,
+    transaction_method,
+    transaction_mode,
+    transaction_source_id,
+    transaction_source_type,
+    transaction_type,
   } = formData;
+
   const mutationHook =
     type === 'income' ? useUpdateIncomeMutation : useUpdateExpenseMutation;
   const [updateTransaction, { isLoading }] = mutationHook();
@@ -126,7 +146,6 @@ const TransactionViewAndUpdateModal = () => {
       const initialTransactionDate = await moment(
         initialTransaction?.date
       ).format('YYYY-MM-DD');
-      console.log(initialTransactionDate);
 
       const formattedDate = await moment({
         year: formData.date.year,
@@ -174,7 +193,6 @@ const TransactionViewAndUpdateModal = () => {
 
   const setInitialData = async () => {
     if (initialTransaction) {
-      console.log(initialTransaction);
       setFormData({
         ...initialTransaction,
         date: await parseDate(
@@ -280,6 +298,61 @@ const TransactionViewAndUpdateModal = () => {
                 className="text-gray-500"
               />
             </div>
+            <Input
+              label="Transaction Method"
+              name="transaction_method"
+              placeholder="Enter transaction method"
+              isDisabled={isDisabled}
+              value={transaction_method}
+              onChange={handleOnChange}
+              isInvalid={!!errors.transaction_method}
+              errorMessage={errors?.transaction_method}
+              className="text-gray-500"
+            />
+            <Input
+              label="Transaction Mode"
+              name="transaction_mode"
+              placeholder="Enter transaction mode"
+              isDisabled={isDisabled}
+              value={transaction_mode}
+              onChange={handleOnChange}
+              isInvalid={!!errors.transaction_mode}
+              errorMessage={errors?.transaction_mode}
+              className="text-gray-500"
+            />
+            <Input
+              label="Transaction Source ID"
+              name="transaction_source_id"
+              placeholder="Enter transaction source ID"
+              isDisabled={isDisabled}
+              value={transaction_source_id}
+              onChange={handleOnChange}
+              isInvalid={!!errors.transaction_source_id}
+              errorMessage={errors?.transaction_source_id}
+              className="text-gray-500"
+            />
+            <Input
+              label="Transaction Source Type"
+              name="transaction_source_type"
+              placeholder="Enter transaction source type"
+              isDisabled={isDisabled}
+              value={transaction_source_type}
+              onChange={handleOnChange}
+              isInvalid={!!errors.transaction_source_type}
+              errorMessage={errors?.transaction_source_type}
+              className="text-gray-500"
+            />
+            <Input
+              label="Transaction Type"
+              name="transaction_type"
+              placeholder="Enter transaction type"
+              isDisabled={isDisabled}
+              value={transaction_type}
+              onChange={handleOnChange}
+              isInvalid={!!errors.transaction_type}
+              errorMessage={errors?.transaction_type}
+              className="text-gray-500"
+            />
             <Textarea
               name="description"
               label="Description"
@@ -313,6 +386,11 @@ const TransactionViewAndUpdateModal = () => {
                   !amount ||
                   !category ||
                   !date ||
+                  !transaction_method ||
+                  !transaction_mode ||
+                  !transaction_source_id ||
+                  !transaction_source_type ||
+                  !transaction_type ||
                   !description ||
                   hasErrors
                 }

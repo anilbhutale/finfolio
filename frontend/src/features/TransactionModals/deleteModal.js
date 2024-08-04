@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   isOpen: false,
-  _id: '',
+  id: '',
   title: '',
   type: '',
   refetch: false,
@@ -14,8 +14,8 @@ const deleteTransactionModalSlice = createSlice({
   reducers: {
     openModal: (state, action) => {
       state.isOpen = true;
-      const { _id, title, type } = action.payload;
-      state._id = _id;
+      const { id, title, type } = action.payload;
+      state.id = id;
       state.title = title;
       state.type = type;
     },

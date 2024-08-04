@@ -13,13 +13,21 @@ import {
   Chip,
   Spinner,
   Input,
+  Button,
 } from '@nextui-org/react';
 import { useDispatch } from 'react-redux';
 import { openModal as deleteModal } from '../../features/TransactionModals/deleteModal';
 import { openModal as viewAndUpdateModal } from '../../features/TransactionModals/viewAndUpdateModal';
 import { EyeOutline as Eye, Edit, Delete } from '../../utils/Icons';
+import { MdAdd } from 'react-icons/md';
 
-const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
+const TransactionTable = ({
+  data,
+  name,
+  isLoading,
+  chipColorMap,
+  openModal,
+}) => {
   const dispatch = useDispatch();
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -135,6 +143,17 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-64 mt-4 lg:mt-0 pl-4"
         />
+        <div className="flex justify-end ml-4">
+          <Button size="sm" onClick={openModal} color="success">
+            <Tooltip
+              onClick={openModal}
+              color="success"
+              content="Add Transaction"
+            >
+              <MdAdd size={24} />
+            </Tooltip>
+          </Button>
+        </div>
       </div>
       <Table
         aria-label="Transactions table"
@@ -214,12 +233,13 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
               invoice_data,
               transaction_source,
               transaction_method,
+              transaction_type,
               transaction_mode,
               date,
               description,
-              _id,
+              id,
             }) => (
-              <TableRow key={_id}>
+              <TableRow key={id}>
                 <TableCell className="text-primary font-calSans tracking-wider capitalize">
                   {title}
                 </TableCell>
@@ -254,7 +274,7 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
                           description,
                           date,
                         },
-                        _id,
+                        id,
                         type: name,
                         isDisabled: true,
                       })
@@ -277,11 +297,11 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
                             transaction: {
                               title,
                               amount,
-                              category: invoice.category.name,
+                              category: invoice_data.category.name,
                               description,
                               date,
                             },
-                            _id,
+                            id,
                             type: name,
                             isDisabled: true,
                           })
@@ -298,14 +318,16 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
                         dispatch(
                           viewAndUpdateModal({
                             transaction: {
-                              _id,
+                              id,
                               title,
                               amount,
-                              category: invoice.category.name,
+                              category: invoice_data.category.name,
                               description,
+                              transaction_method,
                               date,
+                              transaction_type,
                             },
-                            _id,
+                            id,
                             type: name,
                           })
                         )
@@ -318,7 +340,7 @@ const TransactionTable = ({ data, name, isLoading, chipColorMap }) => {
                     <span
                       className="text-lg text-danger cursor-pointer active:opacity-50"
                       onClick={() =>
-                        dispatch(deleteModal({ title, _id, type: name }))
+                        dispatch(deleteModal({ title, id, type: name }))
                       }
                     >
                       <Delete />

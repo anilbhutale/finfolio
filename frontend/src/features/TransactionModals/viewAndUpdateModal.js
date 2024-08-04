@@ -21,11 +21,13 @@ const transactionViewAndUpdateModal = createSlice({
   reducers: {
     openModal: (state, action) => {
       state.isOpen = true;
-      const { type, isDisabled, transaction, _id } = action.payload;
+      const { type, isDisabled, transaction, id, transaction_type } =
+        action.payload;
       state.type = type;
       state.isDisabled = isDisabled;
-      state._id = _id;
-      state.transaction = { ...state.transaction, ...transaction };
+      state.id = id;
+      (state.transaction_type = transaction_type),
+        (state.transaction = { ...state.transaction, ...transaction });
     },
     setRefetch: (state, action) => {
       state.refetch = action.payload;

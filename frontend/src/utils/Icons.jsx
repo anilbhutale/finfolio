@@ -23,7 +23,7 @@ import { TbMoneybag, TbEdit } from 'react-icons/tb';
 import { BiDollarCircle, BiMoneyWithdraw } from 'react-icons/bi';
 import { LuMenu } from 'react-icons/lu';
 import { FiTrash } from 'react-icons/fi';
-import { MdLockReset } from 'react-icons/md';
+import { MdLockReset, MdAdd } from 'react-icons/md';
 
 export const Register = RiShieldUserFill;
 export const Login = RiLoginCircleLine;

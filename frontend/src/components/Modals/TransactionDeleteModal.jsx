@@ -11,8 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import { Delete } from '../../utils/Icons';
-import { useDeleteIncomeMutation } from '../../features/api/apiSlices/incomeApiSlice';
-import { useDeleteExpenseMutation } from '../../features/api/apiSlices/expenseApiSlice';
+import { useDeleteTransactionMutation } from '../../features/api/apiSlices/transactionApiSlice';
 import {
   closeModal,
   setRefetch,
@@ -21,28 +20,25 @@ import { updateLoader } from '../../features/loader/loaderSlice';
 
 const TransactionDeleteModal = () => {
   const data = useSelector((state) => state.deleteTransactionModal);
-  const { isOpen, _id, title, type } = data;
+  const { isOpen, id, title, type } = data;
   const dispatch = useDispatch();
 
-  const mutationHook =
-    type === 'income' ? useDeleteIncomeMutation : useDeleteExpenseMutation;
-  const [deleteTransaction, { isLoading }] = mutationHook();
+  const [deleteTransaction, { isLoading }] = useDeleteTransactionMutation();
 
   const handleDelete = async (e) => {
     try {
       e.preventDefault();
 
       dispatch(updateLoader(40));
-      const res = await deleteTransaction(_id).unwrap();
+      const res = await deleteTransaction(id).unwrap();
 
       dispatch(updateLoader(60));
       await dispatch(setRefetch(true));
       await dispatch(closeModal());
       toast.success(
-        res.message ||
-          (type === 'income'
-            ? 'Income deleted successfully!'
-            : 'Expense deleted successfully!')
+        type === 'debit'
+          ? 'Income deleted successfully!'
+          : 'Expense deleted successfully!'
       );
     } catch (error) {
       console.log(error);
