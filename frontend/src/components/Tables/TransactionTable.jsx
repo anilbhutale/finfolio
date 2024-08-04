@@ -43,7 +43,7 @@ const TransactionTable = ({
       (item) =>
         item.title.toLowerCase().includes(lowercasedQuery) ||
         item.description.toLowerCase().includes(lowercasedQuery) ||
-        item.invoice.category.name.toLowerCase().includes(lowercasedQuery)
+        item.invoice_data.category.name.toLowerCase().includes(lowercasedQuery)
     );
 
     const sortableItems = [...filteredItems];
@@ -107,12 +107,29 @@ const TransactionTable = ({
     <div className="w-full h-full flex flex-col items-center">
       <div className="flex flex-col lg:flex-row justify-between items-center mb-4">
         <div className="flex flex-col lg:flex-row space-y-2 lg:space-y-0 lg:space-x-4">
+          <div className="flex items-center text-xl lg:text-2xl ">
+            <Button
+              size="sm"
+              onClick={openModal}
+              color="success"
+              className="w-48 md:w-64 mt-4 lg:mt-0 ml-4"
+            >
+              <Tooltip
+                onClick={openModal}
+                color="success"
+                content="Add Transaction"
+              >
+                <MdAdd size={24} />
+              </Tooltip>
+              Transaction
+            </Button>
+          </div>
           <div className="flex items-center text-xl lg:text-2xl">
             <h2>
               Total Income -
               <span className="text-emerald-400 ml-2">
                 <NumericFormat
-                  className="ml-1 text-xl lg:text-2xl"
+                  className="w-48 md:w-64 mt-4 lg:mt-0 ml-4"
                   value={income}
                   displayType={'text'}
                   thousandSeparator={true}
@@ -126,7 +143,7 @@ const TransactionTable = ({
               Total Expenses -
               <span className="text-red-400 ml-2 ">
                 <NumericFormat
-                  className="ml-1 text-xl lg:text-2xl"
+                  className="w-48 md:w-64 mt-4 lg:mt-0 ml-4"
                   value={expenses}
                   displayType={'text'}
                   thousandSeparator={true}
@@ -136,23 +153,14 @@ const TransactionTable = ({
             </h3>
           </div>
         </div>
-        <Input
-          clearable
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-64 mt-4 lg:mt-0 pl-4"
-        />
-        <div className="flex justify-end ml-4">
-          <Button size="sm" onClick={openModal} color="success">
-            <Tooltip
-              onClick={openModal}
-              color="success"
-              content="Add Transaction"
-            >
-              <MdAdd size={24} />
-            </Tooltip>
-          </Button>
+        <div className="flex items-center text-xl lg:text-2xl">
+          <Input
+            clearable
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-64 mt-4 lg:mt-0 pl-4"
+          />
         </div>
       </div>
       <Table
