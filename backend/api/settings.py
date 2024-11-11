@@ -61,6 +61,14 @@ INSTALLED_APPS = [
     "core.select_option",
     "core.transaction",
     "core.wallet",
+    "core.category",
+    "core.color",
+    "core.customer",
+    "core.inventory",
+    "core.product",
+    "core.size",
+    "core.type",
+    "core.variant"
 ]
 
 SWAGGER_SETTINGS = {
@@ -92,6 +100,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Add the specific origins that are allowed to access the API
     "http://localhost:8080",
+    "http://localhost:3001",  # Add the specific origins that are allowed to access the API
+    "http://localhost:8001",
     "http://localhost:8000",
     "http://138.68.126.112",
     "http://finfolio.bhutale.in",
@@ -194,6 +204,11 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/api_media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+UNFOLD_ADMIN = {
+    "theme": "default",      # Use a theme that fits your project's design
+    "compact": True,         # Compact mode can help in making tables look more consistent
+    # Add more settings if `unfold` provides any additional global configurations
+}
 
 UNFOLD = {
     "SITE_TITLE": "FinFolio",
@@ -222,7 +237,7 @@ UNFOLD = {
     "SHOW_VIEW_ON_SITE": True,  # show/hide "View on site" button, default: True
     # "ENVIRONMENT": "sample_app.environment_callback",
     # "DASHBOARD_CALLBACK": "sample_app.dashboard_callback",
-    "THEME": "dark",  # Force theme: "dark" or "light". Will disable theme switcher
+    "THEME": "light",  # Force theme: "dark" or "light". Will disable theme switcher
     "LOGIN": {
         # "image": lambda request: static("sample/login-bg.jpg"),
         "image": "https://www.svgrepo.com/show/246745/archery-bow.svg",
