@@ -1,5 +1,6 @@
 # ignore .env.<ext> files like .env.dev but not .env-example
 .env.*
+.env
 ./frontend/node_modules
 ./frontend/.env
 ./frontend/.env.*
