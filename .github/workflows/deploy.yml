@@ -3,7 +3,7 @@ name: Deploy Application
 on:
   push:
     branches:
-      - main # Change this to your default branch if it's not `main`
+      - main  # Change this to your default branch if it's not `main`
 
 jobs:
   deploy:
@@ -20,33 +20,25 @@ jobs:
       - name: Install SSH Client and sshpass
         run: sudo apt-get install -y openssh-client sshpass
 
-      # Create .ssh directory
-      - name: Create .ssh directory
-        run: mkdir -p ~/.ssh
-
-      # Add SSH Host Key
-      - name: Add SSH Host Key
-        run: |
-          echo "Setting up SSH and known_hosts"
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
-
-      # Deploy to DigitalOcean
+      # Deploy to DigitalOcean (with hardcoded host, user, password, and custom port 5417)
       - name: Deploy to DigitalOcean
-        env:
-          SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
-          sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+          HOST=${{ secrets.DO_HOST }}  # Replace with your DigitalOcean host IP or domain
+          USER="root" # Replace with your SSH username
+          PASSWORD=${{ secrets.DO_SSH_PASSWORD }}  # Replace with your SSH password
+          PORT=5417  # Custom SSH port
+
+          # Use sshpass to login and execute commands with the custom port
+          sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no -p $PORT $USER@$HOST << 'EOF'
             set -e  # Exit on any error
             if [ -d /mnt/dev/finfolio ]; then
               cd /mnt/dev/finfolio
               if [ -d .git ]; then
-                git pull origin main  # Update your codebase if it's a Git repository
-                docker-compose -f docker-compose.prod.yml down
-                docker-compose -f docker-compose.prod.yml pull
-                docker-compose -f docker-compose.prod.yml build
-                docker-compose -f docker-compose.prod.yml up -d
+                git pull origin main  # Update the codebase if it's a Git repository
+                docker-compose -f docker-compose.prod.yml down  # Stop and remove containers
+                docker-compose -f docker-compose.prod.yml pull  # Pull the latest images
+                docker-compose -f docker-compose.prod.yml build  # Build the images
+                docker-compose -f docker-compose.prod.yml up -d  # Start the containers in detached mode
               else
                 echo "Not a git repository, skipping git pull"
               fi
