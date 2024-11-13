@@ -83,8 +83,8 @@ ALLOWED_HOSTS = [
     "nginx",
     "yourdomain.com",
     "138.68.126.112",
-    "http://finfolio.bhutale.in/",
-    "finfolio.bhutale.in",
+    "http://wifi.bhutale.in/",
+    "wifi.bhutale.in",
 ]
 
 MIDDLEWARE = [
@@ -103,11 +103,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3001",  # Add the specific origins that are allowed to access the API
     "http://localhost:8001",
     "http://localhost:8000",
-    "http://138.68.126.112",
-    "http://finfolio.bhutale.in",
-    "http://138.68.126.112:8000",
-    "http://138.68.126.112:8080",
-    "http://138.68.126.112:80",
+    "http://103.235.105.48",
+    "http://wifi.bhutale.in",
+    "http://103.235.105.48:8000",
+    "http://103.235.105.48:8080",
+    "http://103.235.105.48:80",
     "http://localhost",
 ]
 
