@@ -31,8 +31,8 @@ jobs:
           echo "Setting up SSH and known_hosts"
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "Adding SSH host key for ${ { secrets.DO_HOST } } to known_hosts"
-          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
+          echo "Adding SSH host key for $DO_HOST to known_hosts"  # Corrected substitution
+          ssh-keyscan -H $DO_HOST >> ~/.ssh/known_hosts
           echo "SSH host key added successfully"
 
       # Deploy to DigitalOcean
@@ -49,8 +49,8 @@ jobs:
           echo "SSH private key configured successfully"
 
           # SSH into the server and execute deployment steps
-          echo "Connecting to ${ { secrets.DO_USER } }@${ { secrets.DO_HOST } } on port 5417"
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} -p 5417 << 'EOF'
+          echo "Connecting to $DO_USER@$DO_HOST on port 5417"
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $DO_USER@$DO_HOST -p 5417 << 'EOF'
             set -e  # Exit on any error
             echo "Starting deployment..."
             if [ -d /mnt/dev/finfolio ]; then
