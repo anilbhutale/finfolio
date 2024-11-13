@@ -34,7 +34,7 @@ jobs:
         env:
           SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
-          sshpass -p "${SSH_PASSWORD}" ssh -p 5417 ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+          ssshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -t -p 5417 ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << EOF
             set -e  # Exit on any error
             if [ -d /mnt/dev/finfolio ]; then
               cd /mnt/dev/finfolio
