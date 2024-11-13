@@ -3,7 +3,7 @@ name: Deploy Application
 on:
   push:
     branches:
-      - main  # Trigger the workflow when code is pushed to the main branch
+      - main # Change this to your default branch if it's not `main`
 
 jobs:
   deploy:
@@ -13,64 +13,45 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # Install SSH Client
-      - name: Install SSH Client
-        run: sudo apt-get install -y openssh-client
+      # Install SSH Client and sshpass
+      - name: Install SSH Client and sshpass
+        run: sudo apt-get install -y openssh-client sshpass
 
-      # Set up SSH and known_hosts
-      - name: Setup SSH and known_hosts
-        env:
-          DO_HOST: ${{ secrets.DO_HOST }}  # Pass the secret here
+      # Create .ssh directory
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
+
+      # Add SSH Host Key
+      - name: Add SSH Host Key
         run: |
           echo "Setting up SSH and known_hosts"
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "Adding SSH host key for $DO_HOST to known_hosts"
-          ssh-keyscan -H $DO_HOST >> ~/.ssh/known_hosts
-          echo "SSH host key added successfully"
+          ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
 
       # Deploy to DigitalOcean
       - name: Deploy to DigitalOcean
         env:
-          SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}  # Secret for SSH password
-          DO_USER: ${{ secrets.DO_USER }}  # Secret for SSH username
-          DO_HOST: ${{ secrets.DO_HOST }}  # Secret for the server host
+          SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}
         run: |
-          echo "Deploying to DigitalOcean"
-          
-          # Use sshpass to pass the password and SSH into the server
-          sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no $DO_USER@$DO_HOST -p 5417 << 'EOF'
+          sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
             set -e  # Exit on any error
-            echo "Starting deployment..."
             if [ -d /mnt/dev/finfolio ]; then
-              echo "Directory /mnt/dev/finfolio exists. Proceeding with deployment."
               cd /mnt/dev/finfolio
               if [ -d .git ]; then
-                echo "Git repository found. Pulling latest changes from main..."
                 git pull origin main  # Update your codebase if it's a Git repository
-                echo "Git pull completed successfully."
-                
-                echo "Shutting down existing Docker containers..."
                 docker-compose -f docker-compose.prod.yml down
-                echo "Docker containers shut down."
-                
-                echo "Pulling new Docker images..."
                 docker-compose -f docker-compose.prod.yml pull
-                echo "Docker images pulled successfully."
-
-                echo "Building new Docker images..."
                 docker-compose -f docker-compose.prod.yml build
-                echo "Docker images built successfully."
-
-                echo "Starting up Docker containers..."
                 docker-compose -f docker-compose.prod.yml up -d
-                echo "Docker containers started successfully."
               else
                 echo "Not a git repository, skipping git pull"
               fi
             else
-              echo "Directory /
+              echo "Directory /mnt/dev/finfolio does not exist"
+              exit 1
+            fi
+          EOF
