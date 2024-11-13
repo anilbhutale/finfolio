@@ -1,10 +1,3 @@
-name: Deploy Application
-
-on:
-  push:
-    branches:
-      - main  # Change this to your default branch if it's not `main`
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,37 +13,31 @@ jobs:
 
       # Install SSH Client
       - name: Install SSH Client
-        run: |
-          echo "Installing SSH Client"
-          sudo apt-get install -y openssh-client
-          echo "SSH Client installation completed"
+        run: sudo apt-get install -y openssh-client
 
-      # Create .ssh directory and add the SSH Host key to known_hosts
+      # Set up SSH and known_hosts
       - name: Setup SSH and known_hosts
+        env:
+          DO_HOST: ${{ secrets.DO_HOST }}  # Pass the secret here
         run: |
           echo "Setting up SSH and known_hosts"
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-          echo "Adding SSH host key for $DO_HOST to known_hosts"  # Corrected substitution
+          echo "Adding SSH host key for $DO_HOST to known_hosts"
           ssh-keyscan -H $DO_HOST >> ~/.ssh/known_hosts
           echo "SSH host key added successfully"
 
       # Deploy to DigitalOcean
       - name: Deploy to DigitalOcean
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.DO_SSH_PRIVATE_KEY }}  # Ensure this secret is added in GitHub Secrets
+          SSH_PASSWORD: ${{ secrets.DO_SSH_PASSWORD }}  # Secret for SSH password
+          DO_USER: ${{ secrets.DO_USER }}  # Secret for SSH username
+          DO_HOST: ${{ secrets.DO_HOST }}  # Secret for the server host
         run: |
-          echo "Preparing to deploy to DigitalOcean"
-
-          # Create .ssh directory and configure the private key for SSH
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo "SSH private key configured successfully"
-
-          # SSH into the server and execute deployment steps
-          echo "Connecting to $DO_USER@$DO_HOST on port 5417"
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $DO_USER@$DO_HOST -p 5417 << 'EOF'
+          echo "Deploying to DigitalOcean"
+          
+          # Use sshpass to pass the password and SSH into the server
+          sshpass -p "${SSH_PASSWORD}" ssh -o StrictHostKeyChecking=no $DO_USER@$DO_HOST -p 5417 << 'EOF'
             set -e  # Exit on any error
             echo "Starting deployment..."
             if [ -d /mnt/dev/finfolio ]; then
