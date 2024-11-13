@@ -1,49 +1,28 @@
-name: Deploy Application
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - main  # Change this to your default branch if it's not `main`
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: Install sshpass
+        run: sudo apt-get install sshpass
 
-      # Install SSH Client and sshpass
-      - name: Install SSH Client and sshpass
-        run: sudo apt-get install -y openssh-client sshpass
-
-      # Deploy to DigitalOcean (with hardcoded host, user, password, and custom port 5417)
-      - name: Deploy to DigitalOcean
+      - name: SSH to server and run Docker commands
         run: |
-          HOST=${{ secrets.DO_HOST }}  # Replace with your DigitalOcean host IP or domain
-          USER="root" # Replace with your SSH username
-          PASSWORD=${{ secrets.DO_SSH_PASSWORD }}  # Replace with your SSH password
-          PORT=5417  # Custom SSH port
-
-          # Use sshpass to login and execute commands with the custom port
-          sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no -p $PORT $USER@$HOST << 'EOF'
-            set -e  # Exit on any error
-            if [ -d /mnt/dev/finfolio ]; then
-              cd /mnt/dev/finfolio
-              if [ -d .git ]; then
-                git pull origin main  # Update the codebase if it's a Git repository
-                docker-compose -f docker-compose.prod.yml down  # Stop and remove containers
-                docker-compose -f docker-compose.prod.yml pull  # Pull the latest images
-                docker-compose -f docker-compose.prod.yml build  # Build the images
-                docker-compose -f docker-compose.prod.yml up -d  # Start the containers in detached mode
-              else
-                echo "Not a git repository, skipping git pull"
-              fi
-            else
-              echo "Directory /mnt/dev/finfolio does not exist"
-              exit 1
-            fi
+          sshpass -p ${{ secrets.DO_SSH_PASSWORD }} ssh -o StrictHostKeyChecking=no -p ${{ secrets.DO_PORT }} ${{
+            secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
+            git pull origin main  # Update your codebase
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml pull
+            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml up -d
           EOF
