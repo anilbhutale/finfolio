@@ -1,9 +1,15 @@
+name: Deploy Application
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow when code is pushed to the main branch
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -67,8 +73,4 @@ jobs:
                 echo "Not a git repository, skipping git pull"
               fi
             else
-              echo "Directory /mnt/dev/finfolio does not exist"
-              exit 1
-            fi
-          EOF
-          echo "Deployment process completed successfully."
+              echo "Directory /
