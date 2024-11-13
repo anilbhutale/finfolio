@@ -5,9 +5,11 @@ from drf_yasg.views import get_schema_view  # Fixed the typo here
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core.admin import my_admin_site
-from core.views import toggle_sidebar
+# from core.views import toggle_sidebar
 from core import urls
 from core.users.views import RegisterView, UserAPIView
+from django.conf.urls.static import static
+from django.conf import settings
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -23,8 +25,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('wifi_in/', my_admin_site.urls), 
+     
     path("peradmin/", admin.site.urls),
+    path('wifi_in/', my_admin_site.urls),
     
     path(
         "api-playground/",
@@ -38,3 +41,4 @@ urlpatterns = [
     path("api/v1/user/", UserAPIView.as_view(), name="user_detail"),  # Changed the name here to avoid confusion with 'user_register'
     path("api/v1/", include(urls)),
 ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
