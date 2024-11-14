@@ -62,7 +62,7 @@ services:
 
   certbot:
     image: certbot/certbot
-    container_name: prod-certbot
+    container_name: prod-certbot-new
     volumes:
       - certbot-etc:/etc/letsencrypt
       - certbot-www:/var/www/certbot
