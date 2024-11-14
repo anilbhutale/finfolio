@@ -76,11 +76,11 @@ SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}},
 }
 CSRF_TRUSTED_ORIGINS = ['https://wifi.bhutale.in']
-SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+SECURE_SSL_REDIRECT = False  # Redirect HTTP to HTTPS
 CSRF_COOKIE_SECURE = True  # Ensure CSRF cookies are sent only over HTTPS
 
 ALLOWED_HOSTS = [
-    'wifi.bhutale.in', 
+    'wifi.bhutale.in', 'www.wifi.bhutale.in'
     "localhost",
     "127.0.0.1",
     "django",
@@ -88,8 +88,6 @@ ALLOWED_HOSTS = [
     "nginx",
     "yourdomain.com",
     "138.68.126.112",
-    "http://wifi.bhutale.in/",
-    "https://wifi.bhutale.in/",
     "wifi.bhutale.in",
     "192.168.31.218",
     '103.235.105.48',
