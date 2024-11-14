@@ -87,6 +87,7 @@ ALLOWED_HOSTS = [
     "http://wifi.bhutale.in/",
     "wifi.bhutale.in",
     "192.168.31.218",
+    '103.235.105.48',
 ]
 
 MIDDLEWARE = [
