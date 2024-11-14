@@ -1,6 +1,8 @@
-from django.db import models
 from django.apps import apps
+from django.db import models
+
 from api.models import UUIDPrimaryKeyModel
+
 
 class ProductVariant(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=50)

@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from core.bank_account.views import BankAccountViewSet
+from core.billing import urls as billing_url
 from core.common import urls as commom_url
 from core.credit_card.views import CreditCardViewSet
 from core.debit_card import urls as debit_url
@@ -35,5 +36,6 @@ urlpatterns = [
     path("", include(debit_url)),
     path("", include(upi_url)),
     path("", include(wallet_url)),
+    path("", include(billing_url)),
     # Add other URLs as needed for CRUD operations
 ]

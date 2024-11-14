@@ -1,0 +1,173 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+    <script type="text/javascript">
+        
+        function startQRScanner(event) {
+
+            // Prevent the default action (if any)
+            event.preventDefault();
+
+            // Find the parent row of the button clicked
+            var row = event.target.closest('tr');
+            var inventoryItemField = row.querySelector('select[name$="inventory_item"]');
+
+            if (!inventoryItemField) {
+                alert("Inventory item field not found!");
+                return;
+            }
+
+            // Create and display modal for QR code scanning
+            var modal = createQRScannerModal();
+            document.body.appendChild(modal);
+
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                .then(function(stream) {
+                    var videoElement = modal.querySelector('video');
+                    videoElement.srcObject = stream;
+                    videoElement.setAttribute("playsinline", true);
+                    videoElement.play();
+                    requestAnimationFrame(function scanQRCode() {
+                        if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = videoElement.videoWidth;
+                            canvas.height = videoElement.videoHeight;
+
+                            const context = canvas.getContext('2d');
+                            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+                            if (code) {
+                                // Validate and set scanned QR data into the inventory_item field
+                                var qrData = code.data.trim();
+                                if (qrData) {
+                                    inventoryItemField.value = qrData;
+
+                                    // Stop the video stream and cleanup
+                                    stopCamera(videoElement, modal);
+
+                                    // Optionally, show a success message
+                                    alert("QR Code scanned successfully: " + qrData);
+                                } else {
+                                    alert("QR code is empty or invalid.");
+                                    requestAnimationFrame(scanQRCode);  // Keep scanning if QR code is invalid
+                                }
+                            } else {
+                                requestAnimationFrame(scanQRCode);  // Continue scanning if QR code is not found
+                            }
+                        } else {
+                            requestAnimationFrame(scanQRCode);
+                        }
+                    });
+                })
+                .catch(function(error) {
+                    alert("Unable to access camera. Please ensure permissions are granted.");
+                    stopCamera(null, modal); // Cleanup if camera access fails
+                });
+        }
+
+        // Create the modal for QR scanning
+        function createQRScannerModal() {
+            var modal = document.createElement('div');
+            modal.classList.add('qr-scanner-modal');
+            modal.style.display = 'flex';
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            modal.style.justifyContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.zIndex = '9999';
+
+            var content = document.createElement('div');
+            content.style.backgroundColor = '#fff';
+            content.style.padding = '20px';
+            content.style.position = 'relative';
+            content.style.textAlign = 'center';
+            content.style.borderRadius = '8px';
+            content.style.maxWidth = '80%';
+            content.style.maxHeight = '80%';
+
+            // Close button
+            var closeButton = document.createElement('span');
+            closeButton.innerHTML = '&times;';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '10px';
+            closeButton.style.right = '10px';
+            closeButton.style.fontSize = '30px';
+            closeButton.style.cursor = 'pointer';
+            closeButton.onclick = function () {
+                stopCamera(videoElement, modal); // Stop camera and remove modal
+                modal.remove();  // Remove the modal from the DOM
+            };
+
+            var videoElement = document.createElement('video');
+            videoElement.style.width = '100%';
+            videoElement.style.height = 'auto';
+            videoElement.style.borderRadius = '8px';
+
+            var resultMessage = document.createElement('p');
+            resultMessage.innerHTML = "Scanning QR Code...";  // Updated text here
+            content.appendChild(closeButton);
+            content.appendChild(videoElement);
+            content.appendChild(resultMessage);
+
+            modal.appendChild(content);
+
+            return modal;
+        }
+
+        // Stop camera and remove the modal
+        function stopCamera(videoElement, modal) {
+            if (videoElement && videoElement.srcObject) {
+                var stream = videoElement.srcObject;
+                var tracks = stream.getTracks();
+                tracks.forEach(function (track) {
+                    track.stop();
+                });
+            }
+            if (modal) {
+                modal.remove(); // Remove the modal from the DOM
+            }
+        }
+
+        function updateTotalPrice(row) {
+            var quantity = row.find('input[name$="quantity"]').val();  // Get quantity value
+            var sprice = row.find('input[name$="price"]').val();        // Get sprice value
+
+            if (quantity && sprice) {
+                // Convert sprice to a number (ensure it's a valid number)
+                var total = parseFloat(quantity) * parseFloat(sprice);
+
+                // Find the total price field in the row and update it
+                var total_price_field = row.find('input[name$="total_price"]');
+                total_price_field.val(total.toFixed(2));  // Format to two decimal places
+            }
+
+            // Update the total amount after calculating total for each row
+            updateTotalAmount();
+        }
+
+        $(document).on('input', 'input[name$="quantity"], input[name$="price"]', function () {
+            var row = $(this).closest('tr');
+            updateTotalPrice(row);
+        });
+        
+        function updateTotalAmount() {
+            var totalAmount = 0;
+            $('input[name$="total_price"]').each(function () {
+                totalAmount += parseFloat($(this).val()) || 0;  // Safely parse and sum up
+            });
+            $('input[name$="total_amount"]').val(totalAmount.toFixed(2));
+        }
+
+    </script>
+{% endblock %}

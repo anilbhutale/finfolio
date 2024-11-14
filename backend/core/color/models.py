@@ -1,5 +1,7 @@
-from api.models import UUIDPrimaryKeyModel
 from django.db import models
+
+from api.models import UUIDPrimaryKeyModel
+
 
 class Color(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=50)

@@ -1,5 +1,7 @@
-from api.models import UUIDPrimaryKeyModel
 from django.db import models
+
+from api.models import UUIDPrimaryKeyModel
+
 
 class ProductCategory(UUIDPrimaryKeyModel):
     name = models.CharField(max_length=100)

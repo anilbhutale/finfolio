@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     "core.product",
     "core.size",
     "core.type",
-    "core.variant"
+    "core.variant",
+    "core.billing",
 ]
 
 SWAGGER_SETTINGS = {
@@ -85,6 +86,7 @@ ALLOWED_HOSTS = [
     "138.68.126.112",
     "http://wifi.bhutale.in/",
     "wifi.bhutale.in",
+    "192.168.31.218",
 ]
 
 MIDDLEWARE = [
@@ -205,8 +207,8 @@ MEDIA_URL = "/api_media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 UNFOLD_ADMIN = {
-    "theme": "default",      # Use a theme that fits your project's design
-    "compact": True,         # Compact mode can help in making tables look more consistent
+    "theme": "default",  # Use a theme that fits your project's design
+    "compact": True,  # Compact mode can help in making tables look more consistent
     # Add more settings if `unfold` provides any additional global configurations
 }
 
