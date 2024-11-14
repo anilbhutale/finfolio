@@ -38,8 +38,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
-    depends_on:
-      - react
     networks:
       - app-network
 
@@ -49,10 +47,13 @@ services:
       dockerfile: Dockerfile.prod
     container_name: prod-nginx
     ports:
-      - "80:80"  # Map port 80 on host to port 80 in the container
+      - "80:80"
+      - "443:443"  # Add port 443 for HTTPS
     volumes:
       - static:/srv/app/staticfiles
       - media:/srv/app/media
+      - certbot-etc:/etc/letsencrypt  # SSL certificates volume
+      - certbot-www:/var/www/certbot  # Webroot for Certbot challenges
     depends_on:
       - django
       - react
@@ -61,12 +62,23 @@ services:
     networks:
       - app-network
 
+  certbot:
+    image: certbot/certbot
+    container_name: prod-certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h; done;'"
+    networks:
+      - app-network
 
 volumes:
   node_modules:
   postgres_data:
   media:
   static:
+  certbot-etc:
+  certbot-www:
 
 networks:
   app-network:
