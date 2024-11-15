@@ -30,7 +30,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("peradmin/", admin.site.urls),
-    path("admin/", my_admin_site.urls),
+    path("wifi_in/", my_admin_site.urls),
     path(
         "api-playground/",
         schema_view.with_ui("swagger", cache_timeout=0),
