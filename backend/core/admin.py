@@ -75,7 +75,7 @@ class BillingItemForm(forms.ModelForm):
 class BillingItemInline(TabularInline):
     model = BillingItem
     extra = 0
-    readonly_fields = ["total_price", "qr_code_scanner"]
+    readonly_fields = ["qr_code_scanner"]
     fields = ["inventory_item", "quantity", "price", "total_price", "qr_code_scanner"]
     form = BillingItemForm
 

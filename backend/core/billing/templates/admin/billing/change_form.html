@@ -7,7 +7,6 @@
     <script type="text/javascript">
         
         function startQRScanner(event) {
-
             // Prevent the default action (if any)
             event.preventDefault();
 
@@ -31,6 +30,8 @@
                     videoElement.srcObject = stream;
                     videoElement.setAttribute("playsinline", true);
                     videoElement.play();
+
+                    // Scan QR Code
                     requestAnimationFrame(function scanQRCode() {
                         if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
                             const canvas = document.createElement('canvas');
@@ -44,22 +45,17 @@
                             const code = jsQR(imageData.data, canvas.width, canvas.height);
 
                             if (code) {
-                                // Validate and set scanned QR data into the inventory_item field
                                 var qrData = code.data.trim();
                                 if (qrData) {
                                     inventoryItemField.value = qrData;
-
-                                    // Stop the video stream and cleanup
                                     stopCamera(videoElement, modal);
-
-                                    // Optionally, show a success message
                                     alert("QR Code scanned successfully: " + qrData);
                                 } else {
                                     alert("QR code is empty or invalid.");
-                                    requestAnimationFrame(scanQRCode);  // Keep scanning if QR code is invalid
+                                    requestAnimationFrame(scanQRCode);  // Keep scanning
                                 }
                             } else {
-                                requestAnimationFrame(scanQRCode);  // Continue scanning if QR code is not found
+                                requestAnimationFrame(scanQRCode);  // Continue scanning if no code found
                             }
                         } else {
                             requestAnimationFrame(scanQRCode);
@@ -168,6 +164,5 @@
             });
             $('input[name$="total_amount"]').val(totalAmount.toFixed(2));
         }
-
     </script>
 {% endblock %}
