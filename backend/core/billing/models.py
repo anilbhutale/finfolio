@@ -22,7 +22,8 @@ class Billing(UUIDPrimaryKeyModel):
 
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="billings")
     date = models.DateTimeField(default=timezone.now)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Not editable from admin auto calculation will happen")
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, help_text="Discount applied to the bill")
     billing_number = models.CharField(max_length=20, unique=True, blank=True)
     payment_mode = models.CharField(
         max_length=10,

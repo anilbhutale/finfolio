@@ -1,37 +1,52 @@
 {% extends "admin/change_form.html" %}
 
 {% block extrahead %}
-    {{ block.super }}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
-    <script type="text/javascript">
+{{ block.super }}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+{% endblock %}
+
+{% block content %}
+{{ block.super }}
+
+<script type="text/javascript">
+    $(document).ready(function () {
         
-        function startQRScanner(event) {
-            // Prevent the default action (if any)
+        $('input[name$="total_amount"]').prop('disabled', true);
+        $('input[name$="billing_number"]').prop('disabled', true);
+        // Hide the "Add another Billing Item" link
+        const addRowLink = $('tr.add-row a');
+        if (addRowLink.length) {
+            addRowLink.hide(); // Hide the link
+        }
+
+        const addBillingItemRow = $('tr.add-row');
+        if (addBillingItemRow.length > 0) {
+            // Add the QR code button
+            const qrButton = $('<div>')
+                .css({ 'width': 'fit-content', 'float': 'right' })
+                .addClass('readonly font-medium max-w-4xl py-2 text-gray-500 text-sm truncate dark:text-gray-400 *:rounded-md bg-gray-50 border px-3 rounded-md shadow-sm dark:border-gray-700 dark:bg-gray-800 w-fit')
+                .html('<button type="button" class="btn btn-info" onclick="startQRScanner(event)">Scan QR Code</button>');
+
+            addBillingItemRow.find('td').append(qrButton);
+        }
+
+        // Define the `startQRScanner` function
+        // Update the startQRScanner function to check if the inventory item exists
+        window.startQRScanner = function (event) {
             event.preventDefault();
 
-            // Find the parent row of the button clicked
-            var row = event.target.closest('tr');
-            var inventoryItemField = row.querySelector('select[name$="inventory_item"]');
-
-            if (!inventoryItemField) {
-                alert("Inventory item field not found!");
-                return;
-            }
-
-            // Create and display modal for QR code scanning
-            var modal = createQRScannerModal();
+            // Open the scanner modal
+            const modal = createQRScannerModal();
             document.body.appendChild(modal);
 
-            // Access the camera
             navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-                .then(function(stream) {
-                    var videoElement = modal.querySelector('video');
+                .then(function (stream) {
+                    const videoElement = modal.querySelector('video');
                     videoElement.srcObject = stream;
                     videoElement.setAttribute("playsinline", true);
                     videoElement.play();
 
-                    // Scan QR Code
                     requestAnimationFrame(function scanQRCode() {
                         if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
                             const canvas = document.createElement('canvas');
@@ -45,32 +60,93 @@
                             const code = jsQR(imageData.data, canvas.width, canvas.height);
 
                             if (code) {
-                                var qrData = code.data.trim();
+                                const qrData = code.data.trim();
                                 if (qrData) {
-                                    inventoryItemField.value = qrData;
+                                    // Check if the item already exists in the table
+                                    const inventoryField = $('select[name$="inventory_item"]');
+                                    let itemExists = false;
+                                    let targetRow = null;
+
+                                    inventoryField.each(function () {
+                                        const optionValue = $(this).val();  // Inventory ID
+                                        if (optionValue === qrData) {
+                                            itemExists = true;
+                                            targetRow = $(this).closest('tr');  // Get the row where the item is located
+                                        }
+                                    });
+
+                                    if (itemExists) {
+                                        // Item already exists, increment the quantity
+                                        const quantityField = targetRow.find('input[name$="quantity"]');
+                                        let currentQuantity = parseInt(quantityField.val()) || 0;
+                                        currentQuantity++;  // Increment quantity by 1
+                                        quantityField.val(currentQuantity).trigger('change');  // Update quantity and trigger change event
+
+                                        // Recalculate total price and amount
+                                        updateTotalPrice(targetRow);  // Recalculate the total price for this row
+                                        updateTotalAmount();  // Recalculate the total amount for the entire order
+                                        alert("Quantity updated for this item.");
+                                    } else {
+                                        // Item doesn't exist, proceed to add a new row
+                                        const addRowLink = document.querySelector('tr.add-row a');
+                                        if (addRowLink) {
+                                            const event = new MouseEvent('click', {
+                                                view: window,
+                                                bubbles: true,
+                                                cancelable: true
+                                            });
+                                            addRowLink.dispatchEvent(event);
+                                        } else {
+                                            console.error("Add another Billing Item link not found.");
+                                        }
+
+                                        // Wait for new row to be added
+                                        setTimeout(function () {
+                                            const newRow = $('tr.dynamic-billing_items').last();
+
+                                            // Set the scanned QR data into the inventory field
+                                            const newInventoryField = newRow.find('select[name$="inventory_item"]');
+                                            newInventoryField.val(qrData).trigger('change');  // Set the value
+
+                                            // Set the price from the selected inventory item
+                                            const selectedOption = newInventoryField.find(`option[value="${qrData}"]`);
+                                            const price = selectedOption.text().split(' ').pop();  // Extract price from option text
+                                            const priceField = newRow.find('input[name$="price"]');
+                                            priceField.val(price).trigger('change');  // Set the price field
+
+                                            // Set the quantity as 1
+                                            const quantityField = newRow.find('input[name$="quantity"]');
+                                            quantityField.val(1).trigger('change');  // Set quantity to 1
+
+                                            // Recalculate the total price and amount
+                                            updateTotalPrice(newRow);  // Recalculate the total price for this new row
+                                            updateTotalAmount();  // Recalculate the total amount for the entire order
+                                        }, 500); // Delay to ensure row is initialized
+                                    }
+
+                                    // Close the scanner
                                     stopCamera(videoElement, modal);
-                                    alert("QR Code scanned successfully: " + qrData);
                                 } else {
                                     alert("QR code is empty or invalid.");
-                                    requestAnimationFrame(scanQRCode);  // Keep scanning
+                                    requestAnimationFrame(scanQRCode); // Continue scanning
                                 }
                             } else {
-                                requestAnimationFrame(scanQRCode);  // Continue scanning if no code found
+                                requestAnimationFrame(scanQRCode); // Keep scanning if no code found
                             }
                         } else {
                             requestAnimationFrame(scanQRCode);
                         }
                     });
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                     alert("Unable to access camera. Please ensure permissions are granted.");
                     stopCamera(null, modal); // Cleanup if camera access fails
                 });
-        }
+        };
 
-        // Create the modal for QR scanning
+        // Create the scanner modal
         function createQRScannerModal() {
-            var modal = document.createElement('div');
+            const modal = document.createElement('div');
             modal.classList.add('qr-scanner-modal');
             modal.style.display = 'flex';
             modal.style.position = 'fixed';
@@ -83,7 +159,7 @@
             modal.style.alignItems = 'center';
             modal.style.zIndex = '9999';
 
-            var content = document.createElement('div');
+            const content = document.createElement('div');
             content.style.backgroundColor = '#fff';
             content.style.padding = '20px';
             content.style.position = 'relative';
@@ -92,8 +168,7 @@
             content.style.maxWidth = '80%';
             content.style.maxHeight = '80%';
 
-            // Close button
-            var closeButton = document.createElement('span');
+            const closeButton = document.createElement('span');
             closeButton.innerHTML = '&times;';
             closeButton.style.position = 'absolute';
             closeButton.style.top = '10px';
@@ -101,17 +176,17 @@
             closeButton.style.fontSize = '30px';
             closeButton.style.cursor = 'pointer';
             closeButton.onclick = function () {
-                stopCamera(videoElement, modal); // Stop camera and remove modal
-                modal.remove();  // Remove the modal from the DOM
+                stopCamera(null, modal); // Stop camera and remove modal
+                modal.remove(); // Remove the modal from the DOM
             };
 
-            var videoElement = document.createElement('video');
+            const videoElement = document.createElement('video');
             videoElement.style.width = '100%';
             videoElement.style.height = 'auto';
             videoElement.style.borderRadius = '8px';
 
-            var resultMessage = document.createElement('p');
-            resultMessage.innerHTML = "Scanning QR Code...";  // Updated text here
+            const resultMessage = document.createElement('p');
+            resultMessage.innerHTML = "Scanning QR Code...";
             content.appendChild(closeButton);
             content.appendChild(videoElement);
             content.appendChild(resultMessage);
@@ -124,45 +199,65 @@
         // Stop camera and remove the modal
         function stopCamera(videoElement, modal) {
             if (videoElement && videoElement.srcObject) {
-                var stream = videoElement.srcObject;
-                var tracks = stream.getTracks();
-                tracks.forEach(function (track) {
-                    track.stop();
-                });
+                const stream = videoElement.srcObject;
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
             }
             if (modal) {
-                modal.remove(); // Remove the modal from the DOM
+                modal.remove();
             }
         }
 
+        // Get price from inventory item select option value (last part after "-")
+        function getItemPrice(itemId) {
+            const optionElement = $('select[name$="inventory_item"] option[value="' + itemId + '"]');
+            if (optionElement.length) {
+                // Get the inner text content of the option element
+                const optionText = optionElement.text().trim();
+
+                // Split by space to get the last part, which should be the price
+                const valueParts = optionText.split(' ');
+                const price = parseFloat(valueParts[valueParts.length - 1]);  // The last part should be the price
+
+                return price || 0;  // Return price or 0 if not found
+            }
+            return 0;  // Return 0 if the item is not found
+        }
+
+        // Update total price based on quantity and price inputs
         function updateTotalPrice(row) {
             var quantity = row.find('input[name$="quantity"]').val();  // Get quantity value
-            var sprice = row.find('input[name$="price"]').val();        // Get sprice value
+            var sprice = row.find('input[name$="price"]').val();        // Get price value
 
             if (quantity && sprice) {
-                // Convert sprice to a number (ensure it's a valid number)
                 var total = parseFloat(quantity) * parseFloat(sprice);
-
-                // Find the total price field in the row and update it
                 var total_price_field = row.find('input[name$="total_price"]');
                 total_price_field.val(total.toFixed(2));  // Format to two decimal places
             }
 
-            // Update the total amount after calculating total for each row
-            updateTotalAmount();
+            updateTotalAmount();  // Update overall total amount
         }
 
         $(document).on('input', 'input[name$="quantity"], input[name$="price"]', function () {
             var row = $(this).closest('tr');
             updateTotalPrice(row);
         });
-        
+        $(document).on('input', 'input[name$="discount"]', function () {
+            updateTotalAmount();
+        });
+
+
+        // Update the overall total amount
         function updateTotalAmount() {
             var totalAmount = 0;
             $('input[name$="total_price"]').each(function () {
                 totalAmount += parseFloat($(this).val()) || 0;  // Safely parse and sum up
             });
+            let discount = $('input[name$="discount"]').first().val();
+            totalAmount = totalAmount-discount
             $('input[name$="total_amount"]').val(totalAmount.toFixed(2));
         }
-    </script>
+
+    });
+</script>
 {% endblock %}

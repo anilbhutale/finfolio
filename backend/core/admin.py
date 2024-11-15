@@ -96,8 +96,8 @@ def get_receipt_context(billing):
 
 # Billing Admin
 class BillingAdmin(ModelAdmin):
-    list_display = ["billing_number", "customer", "date", "total_amount"]
-    readonly_fields = ["billing_number"]
+    list_display = ('billing_number', 'customer', 'total_amount', 'discount', 'payment_mode', 'date')
+    search_fields = ('billing_number', 'customer__name')
     search_fields = ["customer__name", "id"]
     inlines = [BillingItemInline]
     date_hierarchy = "date"
