@@ -20,9 +20,9 @@ from django.shortcuts import redirect
 
 # Custom Admin Site
 class MyAdminSite(UnfoldAdminSite):
-    site_header = "My Custom Admin Dashboard"
-    site_title = "My Custom Admin Panel"
-    index_title = "Welcome to the Custom Admin Panel"
+    site_header = "My WiFi Fashin Admin"
+    site_title = "My WiFi Fashin Admin"
+    index_title = "Welcome to the WiFi Fashion Admin"
 
     def get_urls(self):
         urls = super().get_urls()
