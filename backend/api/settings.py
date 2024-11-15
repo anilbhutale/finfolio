@@ -75,9 +75,9 @@ INSTALLED_APPS = [
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {"api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}},
 }
-# CSRF_TRUSTED_ORIGINS = ['https://wifi.bhutale.in']
-# SECURE_SSL_REDIRECT = False  # Redirect HTTP to HTTPS
-# CSRF_COOKIE_SECURE = True  # Ensure CSRF cookies are sent only over HTTPS
+CSRF_TRUSTED_ORIGINS = ['https://wifi.bhutale.in']
+SECURE_SSL_REDIRECT = False  # Redirect HTTP to HTTPS
+CSRF_COOKIE_SECURE = True  # Ensure CSRF cookies are sent only over HTTPS
 
 ALLOWED_HOSTS = [
     'wifi.bhutale.in', 'www.wifi.bhutale.in',
