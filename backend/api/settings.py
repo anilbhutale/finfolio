@@ -80,7 +80,7 @@ SECURE_SSL_REDIRECT = False  # Redirect HTTP to HTTPS
 CSRF_COOKIE_SECURE = True  # Ensure CSRF cookies are sent only over HTTPS
 
 ALLOWED_HOSTS = [
-    'wifi.bhutale.in', 'www.wifi.bhutale.in'
+    'wifi.bhutale.in', 'www.wifi.bhutale.in',
     "localhost",
     "127.0.0.1",
     "django",
