@@ -1,8 +1,12 @@
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
+from core.product.models import Product
 
 from core.inventory.models import Inventory
+from django.shortcuts import render, get_object_or_404
+import qrcode
+from io import BytesIO
 
 
 def get_inventory_sprice(request):
@@ -31,3 +35,25 @@ class InventoryItemSearchView(View):
             for item in inventory_items
         ]
         return JsonResponse(data, safe=False)
+
+
+
+def print_all_qr_codes(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    inventory_items = product.inventory_items.all()
+
+    qr_codes = []
+    for inventory in inventory_items:
+        qr_code_data = {
+            'product_name': inventory.product.name,
+            'sku': inventory.product.sku,
+            'color': inventory.color.name,
+            'size': inventory.size.size,
+            'stock': inventory.stock,
+            'price': inventory.price,
+            'sprice': inventory.sprice,
+            'qr_code': inventory.qr_code.url,  # Assuming qr_code is the image field URL
+        }
+        qr_codes.append(qr_code_data)
+
+    return render(request, 'inventory/print_qr_code.html', {'qr_codes': qr_codes})

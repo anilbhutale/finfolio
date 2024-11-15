@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt</title>
+    <style>
+        /* Styles for POS Printer */
+        body {
+            width: 80mm;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            text-align: center;
+            margin: 0;
+        }
+        .receipt {
+            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        .header img {
+            max-width: 50px;
+            margin-bottom: 5px;
+        }
+        .header, .footer {
+            text-align: center;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        .info, .footer {
+            font-size: 10px;
+            margin-top: 5px;
+        }
+        .line {
+            border-top: 1px dashed #000;
+            margin: 5px 0;
+        }
+        .customer-info, .item-table, .total-section {
+            width: 100%;
+            font-size: 12px;
+            margin: 0 auto;
+            text-align: left;
+        }
+        .customer-info td, .item-table td {
+            padding: 2px 0;
+        }
+        .item-table, .total-section {
+            margin-top: 5px;
+        }
+        .item-table th, .item-table td {
+            font-size: 12px;
+        }
+        .item-table th {
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+        }
+        .total-section {
+            font-weight: bold;
+            text-align: right;
+        }
+        .footer p {
+            margin: 0;
+        }
+
+        /* Hide buttons during printing */
+        @media print {
+            .buttons {
+                display: none;
+            }
+        }
+    </style>
+    {% load static %}
+</head>
+<body>
+    <div class="receipt">
+        <!-- Header -->
+        <div class="header">
+            <!-- <img src="{% static 'logo.png' %}" alt="Shop Logo"> -->
+            <div class="title">{{ shop_name }}</div>
+            <div class="info">{{ shop_address }}</div>
+            <div class="info">Phone: {{ shop_phone }}</div>
+        </div>
+        <div class="line"></div>
+
+        <!-- Receipt Info -->
+        <table class="customer-info">
+            <tr>
+                <td>Receipt No: {{ billing.id }}</td>
+                <td style="text-align: right;">Date: {{ billing.date }}</td>
+            </tr>
+        </table>
+
+        <!-- Customer Info -->
+        <table class="customer-info">
+            <tr>
+                <td>Customer Name: {{ billing.customer.name }}</td>
+            </tr>
+            <tr>
+                <td>Customer Mobile: {% if billing.customer.mobile %}{{ billing.customer.mobile }}{% else %}00000{% endif %}</td>
+            </tr>
+        </table>
+        <div class="line"></div>
+
+        <!-- Payment Mode -->
+        <table class="customer-info">
+            <tr>
+                <td>Payment Mode: {{ billing.get_payment_mode_display }}</td>
+            </tr>
+        </table>
+        <div class="line"></div>
+
+        <!-- Items Table -->
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Item Color Size</th>
+                    <th style="text-align: center;">Qty</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in billing_items %}
+                <tr>
+                    <td>{{ item.inventory_item.product.name }} {{item.inventory_item.size}} {{item.inventory_item.color}}</td>
+                    <td style="text-align: center;">{{ item.quantity }}</td>
+                    <td style="text-align: right;">{{ item.price|floatformat:2 }}</td>
+                    <td style="text-align: right;">{{ item.total_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="line"></div>
+
+        <!-- Total Section -->
+        <div class="total-section">
+            <table style="width: 100%;">
+                <tr>
+                    <td style="text-align: left;"><strong>Total:</strong></td>
+                    <td style="text-align: right;">{{ billing.total_amount|floatformat:2 }}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="line"></div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Thank You!</strong></p>
+            <p>For shopping with us! Please visit again!</p>
+        </div>
+    </div>
+
+    <!-- Buttons outside the receipt (only visible on screen) -->
+    <div class="buttons">
+        <a href="/admin/billing/billing/">
+            <button class="btn btn-back">Back to Billing List</button>
+        </a>
+        <button onclick="window.print()" class="btn btn-print">Print</button>
+    </div>
+</body>
+</html>

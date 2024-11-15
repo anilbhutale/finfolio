@@ -6,12 +6,14 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view  # Fixed the typo here
 from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from core.inventory.views import print_all_qr_codes
 
 # from core.views import toggle_sidebar
 from core import urls
 from core.admin import my_admin_site
 from core.inventory.views import InventoryItemSearchView, get_inventory_sprice
 from core.users.views import RegisterView, UserAPIView
+from core.billing import views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -42,5 +44,7 @@ urlpatterns = [
     path("api/v1/", include(urls)),
     path("get_inventory_sprice/", get_inventory_sprice, name="get_inventory_sprice"),
     path("api/inventory-items/", InventoryItemSearchView.as_view(), name="inventory-item-search"),
+    path('billing/<uuid:billing_id>/print/', views.print_receipt, name='core_billing_print_receipt'),
+    path('print-qr-code/<uuid:product_id>/', print_all_qr_codes, name='print_all_qr_codes'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

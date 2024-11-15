@@ -13,7 +13,7 @@ from core.select_option import urls as select_option_url
 from core.transaction import urls as transaction_url
 from core.upi import urls as upi_url
 from core.wallet import urls as wallet_url
-
+from core.billing import views
 bank_account_list = BankAccountViewSet.as_view({"get": "list", "post": "create"})
 bank_account_detail = BankAccountViewSet.as_view({"get": "retrieve", "put": "update", "patch": "partial_update", "delete": "destroy"})
 credit_card_list = CreditCardViewSet.as_view({"get": "list", "post": "create"})
@@ -37,5 +37,6 @@ urlpatterns = [
     path("", include(upi_url)),
     path("", include(wallet_url)),
     path("", include(billing_url)),
+    # path('admin/billing/<uuid:billing_id>/print/', views.print_receipt, name='core_billing_print_receipt'),
     # Add other URLs as needed for CRUD operations
 ]

@@ -31,39 +31,21 @@ class Inventory(UUIDPrimaryKeyModel):
     def is_in_stock(self):
         return self.stock > 0
 
-    def generate_qr_code(self, data, text, qr_size=(100, 100), image_size=(200, 100), font_path="arial.ttf"):
-        # Step 1: Create QR code
+    def generate_qr_code(self, data, qr_size=(100, 100)):
+        # Create QR code (no text)
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=2)
         qr.add_data(data)
         qr.make(fit=True)
+        
+        # Generate the QR code image
         qr_img = qr.make_image(fill="black", back_color="white").resize(qr_size)
-
-        # Step 2: Create a blank image for QR and text
-        img = Image.new("RGB", (qr_size[0] + image_size[0], max(qr_size[1], image_size[1])), "white")
-        draw = ImageDraw.Draw(img)
-
-        # Paste QR code
-        img.paste(qr_img, (0, 0))
-
-        # Load custom font, or use default if it fails
-        try:
-            font = ImageFont.truetype(font_path, 14)
-        except IOError:
-            font = ImageFont.load_default()
-
-        # Calculate and position text beside QR code
-        text_x = qr_size[0] + 10
-        text_y = 15
-        draw.multiline_text((text_x, text_y), text, font=font, fill="black")
-
-        return img
+        return qr_img
 
     def save(self, *args, **kwargs):
-        data = str(self.id)  # Ensure UUID is a string for QR code data
-        text = f"SKU: {self.product.sku}\nName: {self.product.name}\nPrice: {self.sprice}\nColor: {self.color.name}\nSize: {self.size.size}"
+        data = str(self.id)  # Use the Inventory ID or other data you want in the QR code
 
-        # Generate the QR code image
-        qr_code_image = self.generate_qr_code(data, text)
+        # Generate the QR code image (without text)
+        qr_code_image = self.generate_qr_code(data)
 
         # Save to ImageField
         buffer = BytesIO()

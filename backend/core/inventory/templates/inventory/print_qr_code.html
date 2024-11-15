@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product QR Code Print</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            width: 80mm;  /* Ensure it fits for 80mm POS printer */
+            margin: 0;
+            text-align: center; /* Center content in browser */
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+
+        td {
+            padding: 5px;
+            vertical-align: top;
+        }
+
+        .qr-code-container {
+            width: 35%;  /* Set width for QR code container */
+            text-align: center;
+        }
+
+        .details-container {
+            width: 65%;  /* Set width for the details container */
+            font-size: 12px;
+            padding-left: 10px;
+        }
+
+        .details-container p {
+            margin: 0;
+            padding: 2px;
+        }
+
+        .details-container p strong {
+            font-size: 14px;
+        }
+
+        .print-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Hide print button when printing */
+        @media print {
+            .print-btn {
+                display: none;
+            }
+
+            table {
+                width: 100%;
+                page-break-before: always;
+            }
+
+            td {
+                padding: 5px;
+            }
+
+            .qr-code-container {
+                width: 35%;
+            }
+
+            .details-container {
+                width: 65%;
+                padding-left: 10px;
+            }
+
+            body {
+                text-align: left; /* Ensure left alignment when printing */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Product QR Codes</h2>
+
+    <div class="container">
+        {% for qr_code in qr_codes %}
+        <p>Stock for print <b> {{qr_code.stock }}</b></p>
+            <!-- Inventory row for each QR code and details -->
+            <div id="inventory-{{ qr_code.sku }}" class="inventory-item">
+                <table>
+                    <tr>
+                        <!-- QR Code column -->
+                        <td class="qr-code-container">
+                            <img src="{{ qr_code.qr_code }}" alt="QR Code" style="width: 80px; height: 80px;">
+                        </td>
+
+                        <!-- Product details column -->
+                        <td class="details-container">
+                            <p><strong>{{ qr_code.product_name }}</strong></p>
+                            <p>SKU: <span>{{ qr_code.sku }}</span></p>
+                            <p>Color: <span>{{ qr_code.color }}</span></p>
+                            <p>Size: <span>{{ qr_code.size }}</span></p>
+                            <p>MRP: <span>{{ qr_code.sprice }}</span></p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Print button for each inventory item -->
+                <button class="print-btn" onclick="printInventory('inventory-{{ qr_code.sku }}')">Print</button>
+               
+            </div>
+        {% endfor %}
+        <a href="/admin/product/product">
+            <button class="print-btn">back</button>
+            </a>
+    </div>
+
+    <script>
+        // Function to print only the selected inventory item
+        function printInventory(inventoryId) {
+            // Get the content to print
+            var printContents = document.getElementById(inventoryId).innerHTML;
+
+            // Save the original content of the page
+            var originalContents = document.body.innerHTML;
+
+            // Replace the body's content with the selected inventory's content
+            document.body.innerHTML = printContents;
+
+            // Trigger the print dialog
+            window.print();
+
+            // Restore the original content after printing
+            document.body.innerHTML = originalContents;
+        }
+    </script>
+
+</body>
+</html>
