@@ -44,7 +44,7 @@ urlpatterns = [
     path("api/v1/", include(urls)),
     path("get_inventory_sprice/", get_inventory_sprice, name="get_inventory_sprice"),
     path("api/inventory-items/", InventoryItemSearchView.as_view(), name="inventory-item-search"),
-    path('billing/<uuid:billing_id>/print/', views.print_receipt, name='core_billing_print_receipt'),
-    path('print-qr-code/<uuid:product_id>/', print_all_qr_codes, name='print_all_qr_codes'),
+    path('api/billing/<uuid:billing_id>/print/', views.print_receipt, name='core_billing_print_receipt'),
+    path('api/print-qr-code/<uuid:product_id>/', print_all_qr_codes, name='print_all_qr_codes'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
