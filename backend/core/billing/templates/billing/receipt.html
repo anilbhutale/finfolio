@@ -6,7 +6,7 @@
     <style>
         /* Styles for POS Printer */
         body {
-            width: 80mm;
+            width: 56mm; /* Set body width to 56mm */
             font-family: Arial, sans-serif;
             font-size: 14px;
             text-align: center;
@@ -14,8 +14,8 @@
         }
         .receipt {
             width: 100%;
-            margin: 0 auto;
-            padding: 10px;
+            margin: 0;
+            padding: 0; /* Remove padding to minimize space */
         }
         .header img {
             max-width: 50px;
@@ -34,8 +34,9 @@
             margin-top: 5px;
         }
         .line {
-            border-top: 1px dashed #000;
+            border-top: 1px dotted #000;
             margin: 5px 0;
+            background: none; /* Ensure no conflicting backgrounds */
         }
         .customer-info, .item-table, .total-section {
             width: 100%;
@@ -58,47 +59,50 @@
         }
         .total-section {
             font-weight: bold;
-            text-align: right;
+            text-align: right; /* Align total to the right */
         }
         .footer p {
             margin: 0;
         }
 
-        /* Hide buttons during printing */
+        /* Prevent page breaks */
         @media print {
-            .buttons {
-                display: none;
+            body {
+                margin: 0;
+            }
+            .receipt {
+                break-inside: avoid;
+                page-break-inside: avoid; /* Prevent breaks in printed PDF */
             }
         }
     </style>
     {% load static %}
 </head>
 <body>
-    <div class="receipt">
+    <div class="receipt" id="receipt">
         <!-- Header -->
         <div class="header">
-            <!-- <img src="{% static 'logo.png' %}" alt="Shop Logo"> -->
             <div class="title">{{ shop_name }}</div>
             <div class="info">{{ shop_address }}</div>
             <div class="info">Phone: {{ shop_phone }}</div>
+            <div class="info">Date: {{  billing.date }}</div>
         </div>
         <div class="line"></div>
 
         <!-- Receipt Info -->
         <table class="customer-info">
             <tr>
-                <td>Receipt No: {{ billing.id }}</td>
-                <td style="text-align: right;">Date: {{ billing.date }}</td>
+                <td>Bill No: {{ billing.billing_number }}</td>
             </tr>
         </table>
 
         <!-- Customer Info -->
         <table class="customer-info">
             <tr>
-                <td>Customer Name: {{ billing.customer.name }}</td>
+                <td>Name: {{ billing.customer.name }}</td>
             </tr>
             <tr>
-                <td>Customer Mobile: {% if billing.customer.mobile %}{{ billing.customer.mobile }}{% else %}00000{% endif %}</td>
+                <td>Mobile: {% if billing.customer.mobile %}{{ billing.customer.mobile }}{% else %}xxxx{% endif %}</td>
             </tr>
         </table>
         <div class="line"></div>
@@ -154,10 +158,33 @@
 
     <!-- Buttons outside the receipt (only visible on screen) -->
     <div class="buttons">
-        <a href="/admin/billing/billing/">
+        <a href="/wifi_in/billing/billing/">
             <button class="btn btn-back">Back to Billing List</button>
         </a>
         <button onclick="window.print()" class="btn btn-print">Print</button>
+        <button onclick="saveAsPDF()" class="btn btn-pdf">Save as PDF</button>
     </div>
+
+    <!-- Include html2pdf.js script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    
+    <!-- Define the saveAsPDF function after html2pdf.js is loaded -->
+    <script>
+        function saveAsPDF() {
+            var element = document.getElementById('receipt');
+            console.log(element.scrollHeight * 0.264583)
+            var length = Math.ceil(element.scrollHeight * 0.264583) + 5
+            console.log(length)
+            var opt = {
+                margin: 0, /* Remove all margins */
+                filename: 'receipt.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 4, useCORS: true },
+                jsPDF: { unit: 'mm', format: [58, length] }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+
 </body>
 </html>
