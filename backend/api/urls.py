@@ -29,7 +29,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path("peradmin/", admin.site.urls),
+    path("admin/", admin.site.urls),
     path("wifi_in/", my_admin_site.urls),
     path(
         "api-playground/",

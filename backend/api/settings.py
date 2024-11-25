@@ -90,6 +90,7 @@ ALLOWED_HOSTS = [
     "138.68.126.112",
     "wifi.bhutale.in",
     "192.168.31.218",
+    "192.168.63.219",
     '103.235.105.48',
     "localhost",
     
@@ -141,7 +142,7 @@ SIMPLE_JWT = {
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"], 
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -246,7 +247,7 @@ UNFOLD = {
     "SHOW_VIEW_ON_SITE": True,  # show/hide "View on site" button, default: True
     # "ENVIRONMENT": "sample_app.environment_callback",
     # "DASHBOARD_CALLBACK": "sample_app.dashboard_callback",
-    "THEME": "light",  # Force theme: "dark" or "light". Will disable theme switcher
+    # "THEME": "light",  # Force theme: "dark" or "light". Will disable theme switcher
     "LOGIN": {
         # "image": lambda request: static("sample/login-bg.jpg"),
         "image": "https://www.svgrepo.com/show/246745/archery-bow.svg",

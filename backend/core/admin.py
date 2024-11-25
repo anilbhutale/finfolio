@@ -17,12 +17,19 @@ from core.type.models import ProductType
 from core.variant.models import ProductVariant
 from core.views import toggle_sidebar
 from django.shortcuts import redirect
+from django.template.response import TemplateResponse
 
 # Custom Admin Site
 class MyAdminSite(UnfoldAdminSite):
+    title = "Custom Title"  # required: custom page header title
     site_header = "My WiFi Fashin Admin"
     site_title = "My WiFi Fashin Admin"
     index_title = "Welcome to the WiFi Fashion Admin"
+    # def index(self, request, extra_context=None):
+    #     # Add custom context if needed
+    #     extra_context = extra_context or {}
+    #     extra_context['custom_message'] = "Welcome to WiFi Fashion Admin Dashboard!"
+    #     return TemplateResponse(request, "admin/custom_index.html", extra_context)
 
     def get_urls(self):
         urls = super().get_urls()
@@ -57,8 +64,9 @@ class ProductAdmin(ModelAdmin):
             if inventory_items.exists():
                 # Redirect to the print all QR codes page
                 return redirect(reverse('print_all_qr_codes', args=[obj.pk]))
+        return redirect(reverse('print_all_qr_codes', args=[obj.pk]))
         # If you want to go back to the change form, use the default response
-        return super().response_change(request, obj)
+        # return super().response_change(request, obj)
 my_admin_site.register(Product, ProductAdmin)
 
 # Billing Item Inline
