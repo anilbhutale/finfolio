@@ -6,8 +6,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
-            width: 51mm;  /* Ensure it fits for 80mm POS printer */
+            font-size: 9px;
+            width: 50mm;  /* Ensure it fits for 80mm POS printer */
             margin: 0;
             text-align: center;
         }
@@ -23,7 +23,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 5px 0;
+            margin: 3px 0;
         }
 
         td {
@@ -38,7 +38,7 @@
 
         .details-container {
             width: 30mm;  /* Set width for the details container */
-            font-size: 10px;
+            font-size: 9px;
             padding-left: 2px;
         }
 
@@ -48,7 +48,7 @@
         }
 
         .details-container p strong {
-            font-size: 10px;
+            font-size: 9px;
         }
 
         .print-btn, .image-btn {
@@ -105,7 +105,7 @@
                 <tr>
                     <!-- QR Code column -->
                     <td class="qr-code-container">
-                        <img src="{{ qr_code.qr_code }}" alt="QR Code" style="width: 20mm; height: 20mm;">
+                        <img src="{{ qr_code.qr_code }}" alt="QR Code" style="width: 20mm; height: 18mm;">
                     </td>
                     <!-- Product details column -->
                     <td class="details-container">
