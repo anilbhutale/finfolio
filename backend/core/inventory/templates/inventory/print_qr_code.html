@@ -100,19 +100,18 @@
         <!-- Inventory row for each QR code and details -->
         <div id="inventory-{{ qr_code.sku }}" class="inventory-item">
 
-            <span style="font-size: 12px; font-weight: bold;"><b>WiFi Fashion Hanegaon</b></span>
+            <span style="font-size: 10px; font-weight: bold;"><b>WiFi Fashion Hanegaon</b></span>
             <table>
                 <tr>
                     <!-- QR Code column -->
                     <td class="qr-code-container">
-                        <img src="{{ qr_code.qr_code }}" alt="QR Code" style="width: 20mm; height: 20mm;">
+                        <img src="{{ qr_code.qr_code }}" alt="QR Code" style="width: 22mm; height: 22mm;">
                     </td>
                     <!-- Product details column -->
                     <td class="details-container">
                         <p><strong>{{ qr_code.product_name }}</strong></p>
                         <p><span>{{ qr_code.sku }}</span></p>
-                        <p><span>{{ qr_code.color }}</span></p>
-                        <p><span>{{ qr_code.size }}</span></p>
+                        <p><span>{{ qr_code.color }} {{ qr_code.size }}</span></p>
                         <p><span>MRP: {{ qr_code.sprice }}</span></p>
                     </td>
                 </tr>
