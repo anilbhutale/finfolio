@@ -99,8 +99,6 @@
         <p>Stock for print <b>{{ qr_code.stock }}</b></p>
         <!-- Inventory row for each QR code and details -->
         <div id="inventory-{{ qr_code.sku }}" class="inventory-item">
-
-            <span style="font-size: 10px; font-weight: bold;"><b>WiFi Fashion Hanegaon</b></span>
             <table>
                 <tr>
                     <!-- QR Code column -->
@@ -109,10 +107,11 @@
                     </td>
                     <!-- Product details column -->
                     <td class="details-container">
+                        <b>WiFi Fashion Hanegaon</b>
                         <p><strong>{{ qr_code.product_name }}</strong></p>
                         <p><span>{{ qr_code.sku }}</span></p>
                         <p><span>{{ qr_code.color }} {{ qr_code.size }}</span></p>
-                        <p><span>MRP: {{ qr_code.sprice }}</span></p>
+                        <p><span>MRP: {{ qr_code.sprice }} </span></p>
                     </td>
                 </tr>
             </table>
