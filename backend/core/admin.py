@@ -83,14 +83,8 @@ class BillingItemForm(forms.ModelForm):
 class BillingItemInline(TabularInline):
     model = BillingItem
     extra = 0
-    readonly_fields = ["qr_code_scanner"]
-    fields = ["inventory_item", "quantity", "price", "total_price", "qr_code_scanner"]
+    fields = ["inventory_item", "quantity", "price", "total_price"]
     form = BillingItemForm
-
-    def qr_code_scanner(self, obj):
-        return mark_safe('<button type="button" class="btn btn-info" onclick="startQRScanner(event)">Scan QR Code</button>')
-
-    qr_code_scanner.short_description = "QR Code Scanner"
 
 # Helper Function for Receipt Context
 def get_receipt_context(billing):
